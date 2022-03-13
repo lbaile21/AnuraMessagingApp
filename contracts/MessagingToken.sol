@@ -152,6 +152,12 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
         require(msg.sender==owner); // only deployer can call this
         contractSecretHash=s_randomWords[0]; // make the secret hash the first element in the array of random words (MUST CALL RIGHT AFTER requestRandomWords())
     }
+    
+    function getContractSecretHash()public view returns(uint256){
+        require(msg.sender==owner); // only deployer can call this
+        return contractSecretHash; // show owner secret hash  (to ensure setContractSecretHash() has successfully fulfilled)
+    }
+
 
     /* BLOCKLIST FUNCTIONS */
     function areTheyBlocked(address _receiver)internal view returns(bool){ // the user we want to check
