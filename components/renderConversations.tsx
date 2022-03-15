@@ -8,110 +8,124 @@ import {
   Text,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
   useDisclosure,
   Flex,
+  Heading,
 } from "@chakra-ui/react";
 import { Textarea } from "@chakra-ui/textarea";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Conversation } from "../interfaces";
+import encrypt from "../web3/cryptography/encrypt";
+import { IPFS as IpfsInterface } from "ipfs-core/types/src/index";
+import decrypt from "../web3/cryptography/decrypt";
+import sendMessage from "../helpers/sendMessage";
+import RenderMessages from "./renderMessages";
 
 const RenderConversations = ({
-  conversations,
+  state: { wallet, ipfs, conversations },
 }: {
-  conversations: Conversation[];
+  state: { wallet: string; ipfs: IpfsInterface; conversations: Conversation[] };
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   const initialRef = React.useRef();
   const [message, setMessage] = useState("");
-  const [encryptedMessage, setEncryptedMessage] = useState("");
+  const [currentModalOpen, setCurrentModalOpen] = useState<number>();
+  const messageBox = useRef();
 
   return (
     <Center flexDir="column">
       {conversations.map((convo, i) => {
+        const [allMessages, setAllMessages] = useState(
+          JSON.parse(convo.messages)
+        );
         return (
           <Box key={i} w="100%">
-            <Center bg="red" mt={3} onClick={onOpen} w="100%" flexDir="column">
-              <Text>#Conversation ID: {convo.tokenID}</Text>
-            </Center>
-
-            <Modal
-              size="4xl"
-              initialFocusRef={initialRef}
-              isOpen={isOpen}
-              onClose={onClose}
+            <Button
+              p="2.5%"
+              mt={3}
+              onClick={() => {
+                setCurrentModalOpen(i);
+                onOpen();
+              }}
+              w="100%"
+              flexDir="column"
             >
-              <ModalOverlay />
-              <ModalContent>
-                <ModalHeader>#Conversation ID: {convo.tokenID}</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody pb={6}>
-                  <FormControl>
-                    <Text>Conversation ID: {convo.tokenID}</Text>
-                    <Textarea
-                      onChange={(e) => {
-                        setMessage(e.currentTarget.value);
-                      }}
-                    />
-                    <Flex mt={3} gap={2} justifyContent="flex-end">
-                      <Button
-                        onClick={() => {
-                          const decipher = (salt) => {
-                            const textToChars = (text) =>
-                              text.split("").map((c) => c.charCodeAt(0));
-                            const applySaltToChar = (code) =>
-                              textToChars(salt).reduce((a, b) => a ^ b, code);
-                            return (encoded) =>
-                              encoded
-                                .match(/.{1,2}/g)
-                                .map((hex) => parseInt(hex, 16))
-                                .map(applySaltToChar)
-                                .map((charCode) =>
-                                  String.fromCharCode(charCode)
-                                )
-                                .join("");
-                          };
-                          const myDecryption = decipher(convo.secretHash);
-                          myDecryption(encryptedMessage);
-                          console.log(myDecryption(encryptedMessage));
-                        }}
-                      >
-                        Decrypt
-                      </Button>
-                      <Button
-                        colorScheme="linkedin"
-                        onClick={() => {
-                          const cipher = (salt) => {
-                            const textToChars = (text) =>
-                              text.split("").map((c) => c.charCodeAt(0));
-                            const byteHex = (n) =>
-                              ("0" + Number(n).toString(16)).substr(-2);
-                            const applySaltToChar = (code) =>
-                              textToChars(salt).reduce((a, b) => a ^ b, code);
+              <Heading>Click me to open conversation #{convo.tokenID}</Heading>
+            </Button>
+            {currentModalOpen == i && (
+              <Modal
+                size="4xl"
+                initialFocusRef={initialRef}
+                isOpen={isOpen}
+                onClose={onClose}
+              >
+                <ModalOverlay />
+                <ModalContent h="85vh">
+                  <ModalHeader>#Conversation ID: {convo.tokenID}</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <FormControl h="100%">
+                      <Flex h="100%" flexDir="column">
+                        <Flex
+                          overflowY="scroll"
+                          border="1px solid black"
+                          borderRadius={10}
+                          h="52.5vh"
+                          // bg="red"
+                          p={3}
+                          gap={3}
+                          flexDir="column"
+                        >
+                          <RenderMessages
+                            messages={allMessages}
+                            convo={convo}
+                            wallet={wallet}
+                          />
+                        </Flex>
 
-                            return (text) =>
-                              text
-                                .split("")
-                                .map(textToChars)
-                                .map(applySaltToChar)
-                                .map(byteHex)
-                                .join("");
-                          };
-                          const encryptMyMessage = cipher(convo.secretHash);
-                          setEncryptedMessage(encryptMyMessage(message));
-                          console.log(encryptedMessage);
-                        }}
-                      >
-                        Encrypt
-                      </Button>
-                    </Flex>
-                  </FormControl>
-                </ModalBody>
-              </ModalContent>
-            </Modal>
+                        <Flex
+                          flexDir="column"
+                          mt={3}
+                          gap={2}
+                          justifyContent="flex-end"
+                        >
+                          <Textarea
+                            ref={messageBox}
+                            onChange={(e) => {
+                              setMessage(e.currentTarget.value);
+                            }}
+                          />
+                          <Button
+                            ml="auto"
+                            colorScheme="linkedin"
+                            onClick={async () => {
+                              // encrypt message
+                              const encryptedMessageToSend = {
+                                sender: wallet,
+                                message: encrypt(convo.secretHash, message),
+                              };
+                              // add it to the current messages
+                              allMessages.push(encryptedMessageToSend);
+                              // update array of messages and rerender for instant changes
+                              setAllMessages([...allMessages]);
+                              // send message
+                              sendMessage(convo, ipfs, allMessages);
+                              // @ts-ignore
+                              messageBox.current.value = ""; // set message box as empty
+                              setMessage("");
+                            }}
+                          >
+                            Send
+                          </Button>
+                        </Flex>
+                      </Flex>
+                    </FormControl>
+                  </ModalBody>
+                </ModalContent>
+              </Modal>
+            )}
           </Box>
         );
       })}

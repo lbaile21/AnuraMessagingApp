@@ -16,11 +16,19 @@
     "ethers": "^5.6.0",
     "framer-motion": "^4",
     "http-server": "^14.1.0",
+    "ipfs": "^0.62.1",
+    "ipfs-api": "^26.1.2",
+    "ipfs-core": "^0.14.1",
+    "ipfs-http-client": "^56.0.1",
+    "ipns": "^0.16.0",
+    "minimist": "^1.2.5",
+    "moment": "^2.29.1",
     "next": "latest",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-use": "^17.3.2",
-    "web3": "^1.7.1"
+    "web3": "^1.7.1",
+    "web3.storage": "^3.5.7"
   },
   "devDependencies": {
     "@types/node": "^12.12.21",

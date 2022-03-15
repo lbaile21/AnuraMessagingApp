@@ -3,7 +3,7 @@ import Web3 from "web3";
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 export { web3 };
 const loadContract = async () => {
-  const contractAddress = "0xabbe0f043Ddc8077d250a0262acD93A6faBcd34E";
+  const contractAddress = "0xBAE36F6747329886544250797Ff19868e31cd1Ff";
   const contract = new web3.eth.Contract(
     [
       {
@@ -25,7 +25,7 @@ const loadContract = async () => {
           },
         ],
         name: "OnlyCoordinatorCanFulfill",
-        // @ts-expect-error
+        // @ts-ignore
         type: "error",
       },
       {
@@ -253,6 +253,30 @@ const loadContract = async () => {
       {
         inputs: [
           {
+            internalType: "address",
+            name: "",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "",
+            type: "uint256",
+          },
+        ],
+        name: "conversationEndpoints",
+        outputs: [
+          {
+            internalType: "string",
+            name: "",
+            type: "string",
+          },
+        ],
+        stateMutability: "view",
+        type: "function",
+      },
+      {
+        inputs: [
+          {
             internalType: "uint256",
             name: "_conversation",
             type: "uint256",
@@ -261,6 +285,19 @@ const loadContract = async () => {
         name: "deleteConversation",
         outputs: [],
         stateMutability: "nonpayable",
+        type: "function",
+      },
+      {
+        inputs: [],
+        name: "getContractSecretHash",
+        outputs: [
+          {
+            internalType: "uint256",
+            name: "",
+            type: "uint256",
+          },
+        ],
+        stateMutability: "view",
         type: "function",
       },
       {
@@ -284,6 +321,11 @@ const loadContract = async () => {
                 internalType: "uint256",
                 name: "tokenID",
                 type: "uint256",
+              },
+              {
+                internalType: "string",
+                name: "IPFSendpoint",
+                type: "string",
               },
             ],
             internalType: "struct MessagingToken.Secrets[]",
@@ -383,38 +425,6 @@ const loadContract = async () => {
       {
         inputs: [
           {
-            internalType: "uint256",
-            name: "",
-            type: "uint256",
-          },
-        ],
-        name: "s_randomWords",
-        outputs: [
-          {
-            internalType: "uint256",
-            name: "",
-            type: "uint256",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "s_requestId",
-        outputs: [
-          {
-            internalType: "uint256",
-            name: "",
-            type: "uint256",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [
-          {
             internalType: "address",
             name: "from",
             type: "address",
@@ -481,25 +491,6 @@ const loadContract = async () => {
       {
         inputs: [
           {
-            internalType: "uint256",
-            name: "",
-            type: "uint256",
-          },
-        ],
-        name: "secretHashes",
-        outputs: [
-          {
-            internalType: "address",
-            name: "",
-            type: "address",
-          },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [
-          {
             internalType: "address",
             name: "operator",
             type: "address",
@@ -528,6 +519,11 @@ const loadContract = async () => {
             internalType: "address",
             name: "_userReceiver",
             type: "address",
+          },
+          {
+            internalType: "string",
+            name: "_endpoint",
+            type: "string",
           },
         ],
         name: "startConversation",
