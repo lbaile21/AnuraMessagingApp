@@ -33,6 +33,7 @@ const RenderConversations = ({
   const [message, setMessage] = useState("");
   const [currentModalOpen, setCurrentModalOpen] = useState<number>();
   const messageBox = useRef();
+  // const [first, setfirst] = useState(second)
 
   return (
     <Center flexDir="column">

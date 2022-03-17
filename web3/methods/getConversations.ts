@@ -7,12 +7,12 @@ const getConversations = async (contract, wallet, ipfs) => {
   const allConversations = [];
 
   for (let i = 0; i < activeConversations.length; i++) {
+    console.log("HERES MY SECRET INFO", activeConversations[i]);
     const messages = await toArray(
       ipfs.files.read(
         `/messography/${activeConversations[i].IPFSendpoint}.json` // grab all messages
       )
     );
-
     allConversations.push({
       // push our data so we can use it
       secretHash: activeConversations[i].secretHash,
