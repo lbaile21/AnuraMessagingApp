@@ -32,27 +32,6 @@ const MyTest = () => {
     })();
   }, []);
   if (!IPFSclient) return <Spinner />;
-  return (
-    <Button
-      onClick={async () => {
-        const addr = "/ipfs/QmbezGequPwcsWo8UL4wDF6a8hYwM1hmbzYv2mnKkEWaUp";
-
-        IPFSclient.name
-          .publish(addr)
-          .then(function (res) {
-            // You now receive a res which contains two fields:
-            //   - name: the name under which the content was published.
-            //   - value: the "real" address to which Name points.
-            console.log(`https://gateway.ipfs.io/ipns/${res.name}`);
-          })
-          .then((val) => {
-            console.log("my value:", val);
-          });
-        console.log("hi");
-      }}
-    >
-      Click
-    </Button>
-  );
+  return <Button onClick={async () => {}}>Click</Button>;
 };
 export default MyTest;
