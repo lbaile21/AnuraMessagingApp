@@ -38,9 +38,10 @@ const RenderConversations = ({
   return (
     <Center flexDir="column">
       {conversations.map((convo, i) => {
-        const [allMessages, setAllMessages] = useState(
-          JSON.parse(convo.messages)
-        );
+        console.log("MY CONVERSATIONS:", convo);
+        // const [allMessages, setAllMessages] = useState(
+        //   JSON.parse(convo.messages)
+        // );
         return (
           <Box key={i} w="100%">
             <Button
@@ -79,7 +80,7 @@ const RenderConversations = ({
                           gap={3}
                           flexDir="column"
                         >
-                          <RenderMessages
+                          {/* <RenderMessages
                             messages={allMessages}
                             convo={convo}
                             wallet={wallet}
@@ -119,7 +120,7 @@ const RenderConversations = ({
                             }}
                           >
                             Send
-                          </Button>
+                          </Button> */}
                         </Flex>
                       </Flex>
                     </FormControl>

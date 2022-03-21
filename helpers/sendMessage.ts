@@ -11,11 +11,24 @@ const sendMessage = async (convo, ipfs, currentMessage) => {
 
   await ipfs.files.write(
     // send it
-    `/messography/${convo.IPFSendpoint}.json`,
+    `/anura-messography/${convo.IPFSendpoint}.json`,
     JSON.stringify(currentMessage), // write it back to IPFS as a string
     {
       create: true,
     }
   );
+
+  const newCID = await ipfs.files.stat(
+    // read it
+    `/anura-messography/${convo.IPFSendpoint}.json`
+  );
+  await fetch("/api/postConvo", {
+    method: "POST",
+    body: JSON.stringify({
+      tokenID: convo.tokenID,
+      CID: newCID.cid.toString(),
+    }),
+  });
+  console.log(newCID.cid.toString());
 };
 export default sendMessage;

@@ -1,10 +1,10 @@
 pragma solidity ^0.8.12;
 // SPDX-License-Identifier: MIT
 
-import "../node_modules/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
-import "../node_modules/@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
-import "../node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 
 library Counters {
@@ -92,7 +92,7 @@ contract VRFv2Consumer is VRFConsumerBaseV2 {
     s_owner = msg.sender;
     s_subscriptionId = subscriptionId;
   }
- 
+
   // Assumes the subscription is funded sufficiently.
   function requestRandomWords() public  {
     // Will revert if subscription is not set and funded.
@@ -129,18 +129,21 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
     using Counters for Counters.Counter;
     Counters.Counter private _tokenId;
     address public owner;
-    uint256 private contractSecretHash;
+    // UPDATE
+    // UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE// UPDATE
+    uint256 private contractSecretHash=12424214231413243;
     
     struct Secrets {
         address secretHash;
         uint256 tokenID; 
+        string IPFSendpoint;
     }
 
     mapping(uint256=>address) internal secretHashes; // tokenIds => secretEncryptionHashes (every tokenId is a different conversation)
     mapping(uint256=>bool) public activeConversations; // tokenIds=> isConversationActive
     mapping(address=>address[]) public blockedUsers; // user => theirBlockedUsers[]
     mapping(address=>uint256[]) public inbox; // user => theirTokenIds[]
-
+    mapping(address=>string[]) public conversationEndpoints; // user => theirConversationsIPFSEndpoint
 
     constructor() VRFv2Consumer(217) ERC1155("LOL") {
         _tokenId.set(1); // initialize erc-1155 token to start at 1
@@ -152,7 +155,7 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
         require(msg.sender==owner); // only deployer can call this
         contractSecretHash=s_randomWords[0]; // make the secret hash the first element in the array of random words (MUST CALL RIGHT AFTER requestRandomWords())
     }
-    
+
     function getContractSecretHash()public view returns(uint256){
         require(msg.sender==owner); // only deployer can call this
         return contractSecretHash; // show owner secret hash  (to ensure setContractSecretHash() has successfully fulfilled)
@@ -191,7 +194,7 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
     }
     
     /* CONVERSATION FUNCTIONS */
-    function startConversation(address _userReceiver)public {
+    function startConversation(address _userReceiver,string memory _endpoint)public {
         require(msg.sender!=address(0),"This is a zero address"); 
         require(areTheyBlocked(_userReceiver)==false,"You have this user blocked!"); // check if the caller blocked them
         require(didTheyBlockMe(_userReceiver)==false,"This user has you blocked!"); // check if receiver blocked caller
@@ -201,6 +204,9 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
         _mint(_userReceiver,tokenId,1,"");     
         inbox[msg.sender].push(tokenId); // add it to both user's token array
         inbox[_userReceiver].push(tokenId);
+        
+        conversationEndpoints[msg.sender].push(_endpoint); // add conversation IPFS endpoint so it can be fetched on front end
+        conversationEndpoints[_userReceiver].push(_endpoint); 
 
         activeConversations[tokenId]=true; // set conversation as active 
 
@@ -216,7 +222,7 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
         
         for(uint256 i = 0;i<inbox[_me].length;i++) { 
             if(activeConversations[inbox[_me][i]]==true) { // only push active conversations
-                mySecretData[i]=Secrets(secretHashes[inbox[_me][i]],inbox[_me][i]); // push new struct to array
+                mySecretData[i]=Secrets(secretHashes[inbox[_me][i]],inbox[_me][i],conversationEndpoints[_me][i]); // push new struct to array
             }
         }
         return mySecretData; 
