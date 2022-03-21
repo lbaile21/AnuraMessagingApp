@@ -1,10 +1,10 @@
 pragma solidity ^0.8.12;
 // SPDX-License-Identifier: MIT
 
-import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
-import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "../node_modules/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
+import "../node_modules/@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "../node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 
 library Counters {
@@ -149,7 +149,11 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
         _tokenId.set(1); // initialize erc-1155 token to start at 1
         owner=msg.sender; // make owner the person who deployed contract
     }
-
+    
+    function getCurrentToken() public view returns (uint256){
+        uint256 tokenId=_tokenId.current(); // get current token id
+        return tokenId-1; // return the token id that was just minted so we can pin the token to it's CID
+    }
 
     function setContractSecretHash()public{
         require(msg.sender==owner); // only deployer can call this
@@ -181,8 +185,9 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
         return false; // im not in their blocked users list so I'm not blocked :)
     }
 
-    function blockUser(address _userToBlock) public {
+    function blockUser(address _userToBlock,uint256 _tokenID) public {
         blockedUsers[msg.sender].push(_userToBlock); // push user to blocked array
+        activeConversations[_tokenID]=false;
     }
 
     function unblockUser(address _blockedUser) public {
@@ -194,7 +199,7 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
     }
     
     /* CONVERSATION FUNCTIONS */
-    function startConversation(address _userReceiver,string memory _endpoint)public {
+    function startConversation(address _userReceiver,string memory _endpoint)public  {
         require(msg.sender!=address(0),"This is a zero address"); 
         require(areTheyBlocked(_userReceiver)==false,"You have this user blocked!"); // check if the caller blocked them
         require(didTheyBlockMe(_userReceiver)==false,"This user has you blocked!"); // check if receiver blocked caller
@@ -228,7 +233,7 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
         return mySecretData; 
     }
 
-    function deleteConversation(uint256 _conversation)public { // _conversation is tokenId
+    function deleteConversation(uint256 _conversation)internal { // _conversation is tokenId
         activeConversations[_conversation]=false; // set it to inactive so that it wont be fetched on getMyActiveConversations()
     }
 
