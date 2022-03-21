@@ -25,12 +25,11 @@ const IndexPage = () => {
     if (!window.ethereum) alert("Please install Metamask");
     try {
       const contract = await loadContract(); // load contract
-      console.log("contract has loaded");
+
       const wallet = await web3.eth.requestAccounts(); // grab wallet from metamask
-      console.log("wallet has been grabbed", wallet);
 
       const conversations = await getConversations(contract, wallet);
-      console.log("conversations loaded:", conversations);
+
       return {
         contract,
         wallet: wallet[0],

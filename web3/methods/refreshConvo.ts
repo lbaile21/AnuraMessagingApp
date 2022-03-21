@@ -17,7 +17,7 @@ const refreshConvo = async (contract, wallet) => {
       messages,
     });
   }
-  console.log("ALL CONVERSATIONS:", allConversations);
+
   return allConversations;
 };
 export default refreshConvo;

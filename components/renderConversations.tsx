@@ -156,7 +156,7 @@ const RenderConversations = ({
                           <Textarea
                             ref={messageBox}
                             onKeyDown={async (e) => {
-                              console.log(message);
+
                               if (
                                 e.key === "Enter" && // when user presses enter
                                 message != "" // and message isn't empty

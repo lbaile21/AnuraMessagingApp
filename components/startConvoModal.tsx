@@ -72,7 +72,6 @@ const startConvoModal = ({ state }) => {
                         .getCurrentToken()
                         .call();
 
-                      console.log("current token id babyyy:", currentTokenId);
                       const response = await fetch("/api/postConvo", {
                         method: "POST",
                         body: JSON.stringify({
@@ -84,7 +83,7 @@ const startConvoModal = ({ state }) => {
                         throw new Error(
                           "Could not start conversation, please try again"
                         );
-                      console.log(res); // log all the response details
+                      // console.log(res); // log all the response details
                       router.reload();
                       return toast({
                         title: "Conversation started!", // prompt success message

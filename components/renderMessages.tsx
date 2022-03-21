@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import decrypt from "../web3/cryptography/decrypt";
 
 const RenderMessages = ({ convo, wallet, messages }) => {
-  console.log(convo);
   const { colorMode } = useColorMode();
   return messages.map((message, i) => {
     // parse since it's a string
@@ -39,7 +38,6 @@ const RenderMessages = ({ convo, wallet, messages }) => {
         key={i}
         flexDir="column"
       >
-        {console.log("we got here:", message)}
         {decrypt(convo.secretHash, message.message)}
       </Flex>
     );

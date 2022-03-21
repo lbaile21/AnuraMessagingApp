@@ -10,7 +10,6 @@ const getConversations = async (contract, wallet, ipfs?) => {
 
   for (let i = 0; i < activeConversations.length; i++) {
     const messages = conversations[activeConversations[i].tokenID];
-    console.log("my mesasges:", messages);
 
     allConversations.push({
       // push our data so we can use it
@@ -20,7 +19,7 @@ const getConversations = async (contract, wallet, ipfs?) => {
       messages,
     });
   }
-  console.log("ALL CONVERSATIONS:", allConversations);
+
   return allConversations;
 };
 export default getConversations;
