@@ -18,7 +18,6 @@ import React, { useState } from "react";
 import { web3 } from "../web3/loadContract";
 import moment from "moment";
 import { useRouter } from "next/router";
-import { IPFS as IPFSINTERFACE } from "../node_modules/ipfs-core-types/src/index";
 
 const startConvoModal = ({ state }) => {
   const [conversationReceiver, setConversationReceiver] = useState<string>();
