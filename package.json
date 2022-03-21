@@ -12,7 +12,6 @@
     "@chakra-ui/react": "^1.8.6",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
-    "@libp2p/websockets": "^1.0.3",
     "@openzeppelin/contracts": "^4.5.0",
     "dnslink": "^0.2.8",
     "eth-crypto": "^2.2.0",
