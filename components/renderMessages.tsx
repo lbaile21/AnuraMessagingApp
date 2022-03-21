@@ -1,15 +1,18 @@
-import { Flex, Center } from "@chakra-ui/react";
+import { Flex, Center, useColorMode } from "@chakra-ui/react";
 import React, { useState } from "react";
 import decrypt from "../web3/cryptography/decrypt";
 
 const RenderMessages = ({ convo, wallet, messages }) => {
-  console.log(messages);
+  console.log(convo);
+  const { colorMode } = useColorMode();
   return messages.map((message, i) => {
     // parse since it's a string
     if (!i) {
       return (
         <Flex
-          bg="gray.200"
+          fontSize="14px"
+          // bg="gray.200"
+          bg={colorMode == "light" ? "gray.200" : "gray.900"}
           borderRadius={5}
           w="100%"
           p="2.5%"
@@ -36,6 +39,7 @@ const RenderMessages = ({ convo, wallet, messages }) => {
         key={i}
         flexDir="column"
       >
+        {console.log("we got here:", message)}
         {decrypt(convo.secretHash, message.message)}
       </Flex>
     );

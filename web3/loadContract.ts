@@ -3,7 +3,7 @@ import Web3 from "web3";
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 export { web3 };
 const loadContract = async () => {
-  const contractAddress = "0xe07E021B86CC5234065b18B29667CE64EBb7e1Fd";
+  const contractAddress = "0xCB22AAC66FE6264E8128B1C5534478597A8dF262";
   const contract = new web3.eth.Contract(
     [
       {
@@ -60,21 +60,13 @@ const loadContract = async () => {
             name: "_userToBlock",
             type: "address",
           },
-        ],
-        name: "blockUser",
-        outputs: [],
-        stateMutability: "nonpayable",
-        type: "function",
-      },
-      {
-        inputs: [
           {
             internalType: "uint256",
-            name: "_conversation",
+            name: "_tokenID",
             type: "uint256",
           },
         ],
-        name: "deleteConversation",
+        name: "blockUser",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",
