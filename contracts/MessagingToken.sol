@@ -1,10 +1,10 @@
 pragma solidity ^0.8.12;
 // SPDX-License-Identifier: MIT
 
-import "../node_modules/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
-import "../node_modules/@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
-import "../node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 
 library Counters {
@@ -185,9 +185,8 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
         return false; // im not in their blocked users list so I'm not blocked :)
     }
 
-    function blockUser(address _userToBlock,uint256 _tokenID) public {
+    function blockUser(address _userToBlock) public {
         blockedUsers[msg.sender].push(_userToBlock); // push user to blocked array
-        activeConversations[_tokenID]=false;
     }
 
     function unblockUser(address _blockedUser) public {
@@ -233,7 +232,7 @@ contract MessagingToken is ERC1155,VRFv2Consumer{
         return mySecretData; 
     }
 
-    function deleteConversation(uint256 _conversation)internal { // _conversation is tokenId
+    function deleteConversation(uint256 _conversation)public { // _conversation is tokenId
         activeConversations[_conversation]=false; // set it to inactive so that it wont be fetched on getMyActiveConversations()
     }
 

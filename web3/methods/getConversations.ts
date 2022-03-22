@@ -5,6 +5,7 @@ const getConversations = async (contract, wallet, ipfs?) => {
   const activeConversations: Conversation[] = await contract.methods // get all active conversations
     .getMyActiveConversations(wallet[0])
     .call({ from: wallet[0] });
+  console.log("ACTIVE CONVOS:", activeConversations);
 
   const allConversations = [];
 
@@ -23,25 +24,3 @@ const getConversations = async (contract, wallet, ipfs?) => {
   return allConversations;
 };
 export default getConversations;
-
-async function toArray(asyncIterator) {
-  const arr = [];
-  for await (const i of asyncIterator) arr.push(i);
-  return arr;
-}
-// const response = await fetch(
-//   `/api/getConvos?q=${activeConversations[i].tokenID}`
-// );
-// console.log("some responses: ", response);
-// const messages = await response.json();
-// console.log("some messages baby:", messages);
-// const messages = await ipfs.ipns.online.cache.lru.get(
-//   activeConversations[i].IPFSendpoint
-// );
-
-// console.log("my messages", messages);
-// const messages = await toArray(
-//   ipfs.files.read(
-//     `/anura-messography/${activeConversations[i].IPFSendpoint}.json` // grab all messages
-//   )
-// );

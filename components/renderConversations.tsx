@@ -25,7 +25,7 @@ import sendMessage from "../helpers/sendMessage";
 import RenderMessages from "./renderMessages";
 import getConversations from "../web3/methods/getConversations";
 import refreshConvo from "../web3/methods/refreshConvo";
-
+import conversationsFile from "../conversations.json";
 const RenderConversations = ({
   state: { wallet, conversations, contract },
 }: {
@@ -74,7 +74,10 @@ const RenderConversations = ({
               <Text textAlign="right" fontWeight="500">
                 Conversation with{" "}
                 <span style={{ fontWeight: "bold" }}>
-                  {convo.messages[0].receiver}
+                  {/* {console.log(convo)} */}
+                  {convo.messages[0].receiver == wallet
+                    ? convo.messages[0].sender
+                    : convo.messages[0].receiver}
                 </span>
               </Text>
               <Box textAlign="right">
@@ -156,7 +159,6 @@ const RenderConversations = ({
                           <Textarea
                             ref={messageBox}
                             onKeyDown={async (e) => {
-
                               if (
                                 e.key === "Enter" && // when user presses enter
                                 message != "" // and message isn't empty
@@ -182,30 +184,42 @@ const RenderConversations = ({
                               setMessage(e.currentTarget.value);
                             }}
                           />
-                          <Button
-                            ml="auto"
-                            colorScheme="linkedin"
-                            onClick={async () => {
-                              if (message != "") {
-                                // encrypt message
-                                const encryptedMessageToSend = {
-                                  sender: wallet,
-                                  message: encrypt(convo.secretHash, message),
-                                };
-                                // add it to the current messages
-                                allMessages.push(encryptedMessageToSend);
-                                // update array of messages and rerender for instant changes
-                                setAllMessages([...allMessages]);
-                                // send message
-                                sendMessage(convo, allMessages);
-                                // @ts-ignore
-                                messageBox.current.value = ""; // set message box as empty
-                                setMessage("");
-                              }
-                            }}
-                          >
-                            Send
-                          </Button>
+                          <Center justifyContent="flex-end" gap={5}>
+                            <Button
+                              onClick={() => {
+                                console.log(conversationsFile[convo.tokenID]);
+                                setAllMessages([
+                                  ...conversationsFile[convo.tokenID],
+                                ]);
+                              }}
+                            >
+                              Refresh messages
+                            </Button>
+                            <Button
+                              // ml="auto"
+                              colorScheme="linkedin"
+                              onClick={async () => {
+                                if (message != "") {
+                                  // encrypt message
+                                  const encryptedMessageToSend = {
+                                    sender: wallet,
+                                    message: encrypt(convo.secretHash, message),
+                                  };
+                                  // add it to the current messages
+                                  allMessages.push(encryptedMessageToSend);
+                                  // update array of messages and rerender for instant changes
+                                  setAllMessages([...allMessages]);
+                                  // send message
+                                  sendMessage(convo, allMessages);
+                                  // @ts-ignore
+                                  messageBox.current.value = ""; // set message box as empty
+                                  setMessage("");
+                                }
+                              }}
+                            >
+                              Send
+                            </Button>
+                          </Center>
                         </Flex>
                       </Flex>
                     </FormControl>
