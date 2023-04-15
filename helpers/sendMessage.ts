@@ -1,39 +1,30 @@
 import encrypt from "../web3/cryptography/encrypt";
 
+const POST_CONVO_ENDPOINT = "/api/postConvo";
+
 const sendMessage = async (convo, currentMessage) => {
+  if (!convo || typeof convo.tokenID === "undefined") {
+    throw new Error("sendMessage: missing convo or tokenID");
+  }
+  if (!currentMessage) {
+    throw new Error("sendMessage: message is empty");
+  }
+
   try {
-    // const fullyEncryptedMessage = encrypt(convo.secretHash, message); // encrypt message
-
-    // const messageToSend = { sender: wallet, message: fullyEncryptedMessage }; // create the message object we want to send
-    // const parsedMessages = JSON.parse(convo.messages); // since we receive all JSON as strings, we have to parse our array
-
-    // const currentMessages = [...parsedMessages]; // spread it into a new variable so we can edit it without causing errors
-    // currentMessages.push(messageToSend); // push new message
-
-    // await ipfs.files.write(
-    //   // send it
-    //   `/anura-messography/${convo.IPFSendpoint}.json`,
-    //   JSON.stringify(currentMessage), // write it back to IPFS as a string
-    //   {
-    //     create: true,
-    //   }
-    // );
-
-    // const newCID = await ipfs.files.stat(
-    //   // read it
-    //   `/anura-messography/${convo.IPFSendpoint}.json`
-    // );
-    await fetch("/api/postConvo", {
+    const response = await fetch(POST_CONVO_ENDPOINT, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         tokenID: convo.tokenID,
         message: currentMessage,
       }),
     });
-    // if (!response.ok) throw new Error("Could not get send message");
-    // return response;
-    // console.log(newCID.cid.toString());
-    // await ipfs.pin.add(newCID.cid.toString());
+
+    if (!response.ok) {
+      throw new Error(`Failed to send message (status ${response.status})`);
+    }
+
+    return response;
   } catch (err) {
     alert(err.message);
   }
