@@ -5,19 +5,11 @@ const refreshConvo = async (contract, wallet) => {
     .getMyActiveConversations(wallet)
     .call({ from: wallet });
 
-  const allConversations = [];
-
-  for (let i = 0; i < activeConversations.length; i++) {
-    const messages = conversations[activeConversations[i].tokenID];
-    allConversations.push({
-      // push our data so we can use it
-      secretHash: activeConversations[i].secretHash,
-      tokenID: activeConversations[i].tokenID,
-      IPFSendpoint: activeConversations[i].IPFSendpoint,
-      messages,
-    });
-  }
-
-  return allConversations;
+  return activeConversations.map(({ secretHash, tokenID, IPFSendpoint }) => ({
+    secretHash,
+    tokenID,
+    IPFSendpoint,
+    messages: conversations[tokenID],
+  }));
 };
 export default refreshConvo;
