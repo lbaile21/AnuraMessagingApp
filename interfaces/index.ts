@@ -6,6 +6,7 @@ export interface Conversation {
 }
 export interface Message {
   sender: string;
+  /** Human-readable text content of the message. */
   message: string;
   receiver?: string;
 }
