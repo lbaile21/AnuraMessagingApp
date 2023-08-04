@@ -24,21 +24,32 @@ const decrypt = (secretHash: string, encryptedMessage: string): string => {
   return decipher(secretHash)(encryptedMessage);
 };
 
-const textToCharCodes = (text: string): number[] =>
-  text.split("").map((c) => c.charCodeAt(0));
+const textToCharCodes = (text: string): number[] => {
+  const codes = new Array<number>(text.length);
+  for (let i = 0; i < text.length; i++) {
+    codes[i] = text.charCodeAt(i);
+  }
+  return codes;
+};
 
-const xorReduce = (codes: number[], code: number): number =>
-  codes.reduce((a, b) => a ^ b, code);
+const xorReduce = (codes: number[], code: number): number => {
+  let acc = code;
+  for (let i = 0; i < codes.length; i++) {
+    acc ^= codes[i];
+  }
+  return acc;
+};
 
 const decipher = (salt: string) => {
   const saltCodes = textToCharCodes(salt);
   return (encoded: string): string => {
-    const hexPairs = encoded.match(/.{1,2}/g) ?? [];
-    return hexPairs
-      .map((hex) => parseInt(hex, 16))
-      .map((code) => xorReduce(saltCodes, code))
-      .map((charCode) => String.fromCharCode(charCode))
-      .join("");
+    const len = encoded.length >> 1;
+    const chars = new Array<string>(len);
+    for (let i = 0; i < len; i++) {
+      const code = parseInt(encoded.substr(i * 2, 2), 16);
+      chars[i] = String.fromCharCode(xorReduce(saltCodes, code));
+    }
+    return chars.join("");
   };
 };
 
