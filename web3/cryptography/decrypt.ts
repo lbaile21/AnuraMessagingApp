@@ -24,6 +24,7 @@ const decrypt = (secretHash: string, encryptedMessage: string): string => {
   return decipher(secretHash)(encryptedMessage);
 };
 
+/** Converts a string into an array of its UTF-16 char codes. */
 const textToCharCodes = (text: string): number[] => {
   const codes = new Array<number>(text.length);
   for (let i = 0; i < text.length; i++) {
@@ -32,6 +33,7 @@ const textToCharCodes = (text: string): number[] => {
   return codes;
 };
 
+/** XORs `code` against every value in `codes`, returning the accumulated result. */
 const xorReduce = (codes: number[], code: number): number => {
   let acc = code;
   for (let i = 0; i < codes.length; i++) {
