@@ -1,6 +1,10 @@
 import { Conversation } from "../../interfaces";
 import conversations from "../../conversations.json";
 
+/**
+ * Projects an on-chain Conversation onto the shape consumed by the UI,
+ * attaching any locally cached messages keyed by tokenID.
+ */
 const mapConversation = ({ secretHash, tokenID, IPFSendpoint }: Conversation) => ({
   secretHash,
   tokenID,
