@@ -10,4 +10,6 @@ export interface Message {
   message: string;
   /** Optional recipient address; omit for broadcast messages. */
   receiver?: string;
+  /** Optional ARIA label for assistive technologies. */
+  ariaLabel?: string;
 }
