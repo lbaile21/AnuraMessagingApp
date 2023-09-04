@@ -4,7 +4,9 @@ export interface Conversation {
   IPFSendpoint: string;
   messages: Message[];
 }
+
 export interface Message {
+  /** Address or identifier of the message sender. */
   sender: string;
   /** Human-readable text content of the message. */
   message: string;
