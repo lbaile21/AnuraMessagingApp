@@ -5,7 +5,9 @@
     "build": "next build",
     "start": "next start",
     "type-check": "tsc",
-    "export": "next export"
+    "export": "next export",
+    "lint": "next lint",
+    "clean": "rm -rf .next out"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.4.0",
@@ -36,5 +38,8 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
     "typescript": "4.0"
+  },
+  "engines": {
+    "node": ">=14"
   }
 }
