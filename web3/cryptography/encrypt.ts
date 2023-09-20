@@ -1,3 +1,13 @@
+/**
+ * Encrypts a message using a simple XOR cipher keyed by `secretHash`.
+ *
+ * Note: this is a lightweight obfuscation routine and is not intended
+ * for use as a cryptographically secure encryption primitive.
+ *
+ * @param secretHash - Key used to derive the XOR salt.
+ * @param message - Plaintext message to encrypt.
+ * @returns Hex-encoded encrypted string.
+ */
 const encrypt = (secretHash, message): string => {
   const cipher = (salt) => {
     const textToChars = (text) => text.split("").map((c) => c.charCodeAt(0));
