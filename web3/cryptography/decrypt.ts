@@ -48,7 +48,7 @@ const decipher = (salt: string) => {
     const len = encoded.length >> 1;
     const chars = new Array<string>(len);
     for (let i = 0; i < len; i++) {
-      const code = parseInt(encoded.substr(i * 2, 2), 16);
+      const code = parseInt(encoded.slice(i * 2, i * 2 + 2), 16);
       chars[i] = String.fromCharCode(xorReduce(saltCodes, code));
     }
     return chars.join("");
