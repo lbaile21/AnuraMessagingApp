@@ -2,5 +2,9 @@
   {
     "sender": "0x312dasdas",
     "message": "Hello there"
+  },
+  {
+    "sender": "0x9fa8b21c",
+    "message": "Hi, how are you?"
   }
 ]
