@@ -2,11 +2,21 @@ import { Conversation } from "../../interfaces";
 import conversations from "../../conversations.json";
 
 const getConversations = async (contract, wallet, ipfs?) => {
+  if (!contract || !wallet || wallet.length === 0) {
+    return [];
+  }
+
   const account = wallet[0];
 
-  const activeConversations: Conversation[] = await contract.methods
-    .getMyActiveConversations(account)
-    .call({ from: account });
+  let activeConversations: Conversation[] = [];
+  try {
+    activeConversations = await contract.methods
+      .getMyActiveConversations(account)
+      .call({ from: account });
+  } catch (err) {
+    console.error("Failed to fetch active conversations:", err);
+    return [];
+  }
 
   if (!activeConversations || activeConversations.length === 0) {
     return [];
@@ -16,7 +26,7 @@ const getConversations = async (contract, wallet, ipfs?) => {
     secretHash,
     tokenID,
     IPFSendpoint,
-    messages: conversations[tokenID],
+    messages: conversations[tokenID] || [],
   }));
 };
 
