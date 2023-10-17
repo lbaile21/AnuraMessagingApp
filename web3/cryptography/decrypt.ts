@@ -7,6 +7,11 @@
  * @returns The decrypted plaintext string.
  * @throws If the encrypted message is not a valid hex string.
  */
+const HEX_PATTERN = /^[0-9a-fA-F]+$/;
+
+const isValidHex = (value: string): boolean =>
+  value.length % 2 === 0 && HEX_PATTERN.test(value);
+
 const decrypt = (secretHash: string, encryptedMessage: string): string => {
   if (typeof secretHash !== "string" || secretHash.length === 0) {
     throw new Error("decrypt: secretHash must be a non-empty string");
@@ -17,7 +22,7 @@ const decrypt = (secretHash: string, encryptedMessage: string): string => {
   if (encryptedMessage.length === 0) {
     return "";
   }
-  if (encryptedMessage.length % 2 !== 0 || !/^[0-9a-fA-F]+$/.test(encryptedMessage)) {
+  if (!isValidHex(encryptedMessage)) {
     throw new Error("decrypt: encryptedMessage must be a valid hex string");
   }
 
@@ -47,8 +52,8 @@ const decipher = (salt: string) => {
   return (encoded: string): string => {
     const len = encoded.length >> 1;
     const chars = new Array<string>(len);
-    for (let i = 0; i < len; i++) {
-      const code = parseInt(encoded.slice(i * 2, i * 2 + 2), 16);
+    for (let i = 0, j = 0; i < len; i++, j += 2) {
+      const code = parseInt(encoded.slice(j, j + 2), 16);
       chars[i] = String.fromCharCode(xorReduce(saltCodes, code));
     }
     return chars.join("");
