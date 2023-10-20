@@ -2,8 +2,10 @@ import Web3 from "web3";
 
 const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
 export { web3 };
+
+export const CONTRACT_ADDRESS = "0x4fDc5487D4769D5ac6b68041BBB5C83e45dc8476";
+
 const loadContract = async () => {
-  const contractAddress = "0x4fDc5487D4769D5ac6b68041BBB5C83e45dc8476";
   const contract = new web3.eth.Contract(
     [
       {
@@ -588,7 +590,7 @@ const loadContract = async () => {
         type: "function",
       },
     ],
-    contractAddress
+    CONTRACT_ADDRESS
   );
   return contract;
 };
