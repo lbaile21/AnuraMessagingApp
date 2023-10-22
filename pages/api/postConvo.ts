@@ -22,8 +22,22 @@ import fs from "fs";
  */
 const postConversation = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    // Grab tokenID and message from the request body.
-    const { tokenID, message } = JSON.parse(req.body);
+    if (req.method !== "POST") {
+      res.setHeader("Allow", "POST");
+      return res.status(405).json({ err: "Method not allowed" });
+    }
+
+    // Grab tokenID and message from the request body. The body may arrive
+    // pre-parsed (object) or as a raw JSON string depending on the client.
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    const { tokenID, message } = body ?? {};
+
+    if (typeof tokenID !== "string" || tokenID.length === 0) {
+      return res.status(400).json({ err: "Missing or invalid tokenID" });
+    }
+    if (message === undefined) {
+      return res.status(400).json({ err: "Missing message payload" });
+    }
 
     // Merge the new entry into the existing conversations map.
     const conversations = { ...previousConversations };
@@ -47,7 +61,7 @@ const postConversation = async (req: NextApiRequest, res: NextApiResponse) => {
     // Return the pre-write file size (in MB) to the caller.
     res.json(fileSizeInMegabytes);
   } catch (err) {
-    res.status(err.status).json({ err: err.message });
+    res.status(err.status ?? 500).json({ err: err.message });
   }
 };
 export default postConversation;
