@@ -7,7 +7,8 @@
     "type-check": "tsc",
     "export": "next export",
     "lint": "next lint",
-    "clean": "rm -rf .next out"
+    "clean": "rm -rf .next out",
+    "clean:all": "rm -rf .next out node_modules"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.4.0",
