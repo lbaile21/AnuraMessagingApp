@@ -11,14 +11,20 @@ import fs from "fs";
  * existing entries are preserved (or overwritten if the same `tokenID` is
  * supplied again).
  *
- * Expected request body (JSON-encoded string):
+ * Expected request body (JSON-encoded string or pre-parsed object):
  *   {
  *     "tokenID": string,   // unique identifier for the conversation
  *     "message": unknown   // payload to associate with the tokenID
  *   }
  *
- * Response: the current size of `conversations.json` in megabytes, which
- * callers can use as a lightweight signal for storage growth.
+ * Response: the current size of `conversations.json` in megabytes (measured
+ * prior to the write), which callers can use as a lightweight signal for
+ * storage growth over time.
+ *
+ * Errors:
+ *   - 405 if the request method is not POST
+ *   - 400 if `tokenID` or `message` is missing/invalid
+ *   - 500 (or `err.status`) for any unexpected failure
  */
 const postConversation = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
