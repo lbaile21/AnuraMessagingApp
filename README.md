@@ -63,4 +63,5 @@ metadata encodes the payload, sender, and recipient.
 
 - `npm run dev` — start the Next.js dev server
 - `npm run build` — create a production build
+- `npm run start` — run the production build locally
 - `npm run type-check` — run TypeScript in `noEmit` mode
