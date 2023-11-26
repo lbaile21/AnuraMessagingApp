@@ -38,23 +38,22 @@ const textToCharCodes = (text: string): number[] => {
   return codes;
 };
 
-/** XORs `code` against every value in `codes`, returning the accumulated result. */
-const xorReduce = (codes: number[], code: number): number => {
-  let acc = code;
-  for (let i = 0; i < codes.length; i++) {
-    acc ^= codes[i];
-  }
-  return acc;
-};
-
 const decipher = (salt: string) => {
   const saltCodes = textToCharCodes(salt);
+  const saltLen = saltCodes.length;
+  // Precompute the XOR fold of all salt char codes once; XOR-ing each
+  // input byte against this constant is equivalent to folding it against
+  // every salt code individually, but runs in O(1) per byte.
+  let saltXor = 0;
+  for (let i = 0; i < saltLen; i++) {
+    saltXor ^= saltCodes[i];
+  }
   return (encoded: string): string => {
     const len = encoded.length >> 1;
     const chars = new Array<string>(len);
     for (let i = 0, j = 0; i < len; i++, j += 2) {
       const code = parseInt(encoded.slice(j, j + 2), 16);
-      chars[i] = String.fromCharCode(xorReduce(saltCodes, code));
+      chars[i] = String.fromCharCode(code ^ saltXor);
     }
     return chars.join("");
   };
