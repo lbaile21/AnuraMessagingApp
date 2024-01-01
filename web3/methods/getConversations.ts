@@ -18,7 +18,7 @@ const getConversations = async (contract, wallet, ipfs?) => {
     return [];
   }
 
-  if (!activeConversations || activeConversations.length === 0) {
+  if (!Array.isArray(activeConversations) || activeConversations.length === 0) {
     return [];
   }
 
