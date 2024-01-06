@@ -57,7 +57,8 @@ metadata encodes the payload, sender, and recipient.
 1. Install dependencies with `npm install`.
 2. Copy `.env.example` to `.env.local` and fill in your RPC URL and contract
    address.
-3. Run `npm run dev` to start the local development server.
+3. Run `npm run dev` to start the local development server, then open
+   [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Scripts
 
