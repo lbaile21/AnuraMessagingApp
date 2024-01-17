@@ -5,6 +5,10 @@ export { web3 };
 
 export const CONTRACT_ADDRESS = "0x4fDc5487D4769D5ac6b68041BBB5C83e45dc8476";
 
+/**
+ * Instantiates the MessagingToken contract at {@link CONTRACT_ADDRESS}.
+ * Returns a web3 Contract instance ready for read/write calls.
+ */
 const loadContract = async () => {
   const contract = new web3.eth.Contract(
     [
