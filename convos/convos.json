@@ -6,5 +6,9 @@
   {
     "sender": "0x9fa8b21c",
     "message": "Hi, how are you?"
+  },
+  {
+    "sender": "0x312dasdas",
+    "message": "Doing well, thanks for asking!"
   }
 ]
