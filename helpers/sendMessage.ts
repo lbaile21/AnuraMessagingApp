@@ -23,6 +23,30 @@ const assertValidMessage = (message) => {
   }
 };
 
+/**
+ * Announce a status update to assistive technologies via an ARIA live region.
+ * Falls back silently in non-browser environments (e.g. SSR, tests).
+ */
+const announceToScreenReader = (text, politeness = "polite") => {
+  if (typeof document === "undefined" || !isNonEmptyString(text)) {
+    return;
+  }
+
+  const region = document.createElement("div");
+  region.setAttribute("role", "status");
+  region.setAttribute("aria-live", politeness);
+  region.setAttribute("aria-atomic", "true");
+  region.style.position = "absolute";
+  region.style.width = "1px";
+  region.style.height = "1px";
+  region.style.overflow = "hidden";
+  region.style.clip = "rect(0 0 0 0)";
+  region.textContent = text;
+
+  document.body.appendChild(region);
+  setTimeout(() => region.remove(), 1000);
+};
+
 const sendMessage = async (convo, currentMessage) => {
   assertValidConvo(convo);
   assertValidMessage(currentMessage);
@@ -39,9 +63,11 @@ const sendMessage = async (convo, currentMessage) => {
   });
 
   if (!response.ok) {
+    announceToScreenReader("Message failed to send.", "assertive");
     throw new Error(`Failed to send message (status ${response.status})`);
   }
 
+  announceToScreenReader("Message sent.");
   return response;
 };
 
