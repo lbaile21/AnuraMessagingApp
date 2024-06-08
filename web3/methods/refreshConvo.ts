@@ -13,8 +13,11 @@ const mapConversation = ({ secretHash, tokenID, IPFSendpoint }: Conversation) =>
 });
 
 const refreshConvo = async (contract, wallet) => {
-  if (!contract || !wallet) {
-    throw new Error("refreshConvo requires both a contract instance and a wallet address");
+  if (!contract) {
+    throw new Error("refreshConvo requires a contract instance");
+  }
+  if (!wallet) {
+    throw new Error("refreshConvo requires a wallet address");
   }
 
   const activeConversations: Conversation[] = await contract.methods
