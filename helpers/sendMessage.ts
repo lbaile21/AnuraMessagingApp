@@ -2,6 +2,7 @@ import encrypt from "../web3/cryptography/encrypt";
 
 const POST_CONVO_ENDPOINT = "/api/postConvo";
 const MAX_MESSAGE_LENGTH = 4096;
+const LIVE_REGION_TTL_MS = 1000;
 
 const isNonEmptyString = (value) =>
   typeof value === "string" && value.trim().length > 0;
@@ -28,7 +29,7 @@ const assertValidMessage = (message) => {
  * Falls back silently in non-browser environments (e.g. SSR, tests).
  */
 const announceToScreenReader = (text, politeness = "polite") => {
-  if (typeof document === "undefined" || !isNonEmptyString(text)) {
+  if (typeof document === "undefined" || !document.body || !isNonEmptyString(text)) {
     return;
   }
 
@@ -44,22 +45,27 @@ const announceToScreenReader = (text, politeness = "polite") => {
   region.textContent = text;
 
   document.body.appendChild(region);
-  setTimeout(() => region.remove(), 1000);
+  setTimeout(() => {
+    if (region.parentNode) {
+      region.parentNode.removeChild(region);
+    }
+  }, LIVE_REGION_TTL_MS);
 };
+
+const buildPayload = (convo, message) =>
+  JSON.stringify({
+    tokenID: convo.tokenID,
+    message,
+  });
 
 const sendMessage = async (convo, currentMessage) => {
   assertValidConvo(convo);
   assertValidMessage(currentMessage);
 
-  const payload = JSON.stringify({
-    tokenID: convo.tokenID,
-    message: currentMessage,
-  });
-
   const response = await fetch(POST_CONVO_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: payload,
+    body: buildPayload(convo, currentMessage),
   });
 
   if (!response.ok) {
