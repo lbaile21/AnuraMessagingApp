@@ -60,6 +60,17 @@ metadata encodes the payload, sender, and recipient.
 3. Run `npm run dev` to start the local development server, then open
    [http://localhost:3000](http://localhost:3000) in your browser.
 
+### Environment variables
+
+The following variables are read from `.env.local`:
+
+- `NEXT_PUBLIC_RPC_URL` — JSON-RPC endpoint used by the client to read on-chain
+  state. Any standard EVM-compatible RPC will work.
+- `NEXT_PUBLIC_CONTRACT_ADDRESS` — deployed address of the `AnuraMessagingApp`
+  ERC-1155 contract.
+- `NEXT_PUBLIC_CHAIN_ID` *(optional)* — expected chain id; if set, the UI will
+  prompt the user to switch networks when their wallet is connected elsewhere.
+
 ### Scripts
 
 - `npm run dev` — start the Next.js dev server
@@ -67,3 +78,10 @@ metadata encodes the payload, sender, and recipient.
 - `npm run start` — run the production build locally
 - `npm run type-check` — run TypeScript in `noEmit` mode
 - `npm test` — run the Jest test suite
+- `npm run test:watch` — run Jest in watch mode during development
+
+### Testing
+
+Unit tests live alongside their source files under `__tests__/` directories and
+are executed with Jest. Run the full suite with `npm test`, or use
+`npm run test:watch` to re-run tests as files change.
