@@ -29,25 +29,20 @@ const decrypt = (secretHash: string, encryptedMessage: string): string => {
   return decipher(secretHash)(encryptedMessage);
 };
 
-/** Converts a string into an array of its UTF-16 char codes. */
-const textToCharCodes = (text: string): number[] => {
-  const codes = new Array<number>(text.length);
+/** Computes the XOR fold of all UTF-16 char codes in a string in O(n). */
+const xorCharCodes = (text: string): number => {
+  let acc = 0;
   for (let i = 0; i < text.length; i++) {
-    codes[i] = text.charCodeAt(i);
+    acc ^= text.charCodeAt(i);
   }
-  return codes;
+  return acc;
 };
 
 const decipher = (salt: string) => {
-  const saltCodes = textToCharCodes(salt);
-  const saltLen = saltCodes.length;
   // Precompute the XOR fold of all salt char codes once; XOR-ing each
   // input byte against this constant is equivalent to folding it against
   // every salt code individually, but runs in O(1) per byte.
-  let saltXor = 0;
-  for (let i = 0; i < saltLen; i++) {
-    saltXor ^= saltCodes[i];
-  }
+  const saltXor = xorCharCodes(salt);
   return (encoded: string): string => {
     const len = encoded.length >> 1;
     const chars = new Array<string>(len);
