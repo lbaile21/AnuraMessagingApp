@@ -1,35 +1,86 @@
 /**
- * Decrypts a hex-encoded message that was encrypted using a XOR cipher
- * with the given secret hash as the salt.
+ * XOR-cipher decryption utilities.
  *
- * @param secretHash - The secret salt used during encryption.
- * @param encryptedMessage - The hex-encoded encrypted payload.
- * @returns The decrypted plaintext string.
- * @throws If the encrypted message is not a valid hex string.
+ * This module is the inverse of the corresponding `encrypt` module: it
+ * takes a hex-encoded payload produced by XOR-ing each plaintext UTF-16
+ * code unit against a salt-derived key, and recovers the original text.
+ *
+ * The cipher is intentionally simple and is NOT cryptographically secure.
+ * It exists for obfuscation / lightweight tamper-evidence only and must
+ * not be relied upon to protect secrets.
+ *
+ * @module web3/cryptography/decrypt
  */
+
+/** Matches a string composed solely of hexadecimal digits. */
 const HEX_PATTERN = /^[0-9a-fA-F]+$/;
 
-const isValidHex = (value: string): boolean =>
-  value.length % 2 === 0 && HEX_PATTERN.test(value);
+/** Number of hex characters used to encode a single byte. */
+const HEX_CHARS_PER_BYTE = 2;
 
-const decrypt = (secretHash: string, encryptedMessage: string): string => {
+/**
+ * Returns `true` when `value` is a well-formed hex string of even length.
+ *
+ * An even length is required because each decoded byte consumes exactly
+ * two hex characters; an odd-length string cannot represent a whole
+ * number of bytes and is therefore rejected as malformed.
+ */
+const isValidHex = (value: string): boolean =>
+  value.length % HEX_CHARS_PER_BYTE === 0 && HEX_PATTERN.test(value);
+
+/**
+ * Validates the arguments passed to {@link decrypt}.
+ *
+ * Throws a descriptive `Error` if either argument is of the wrong type
+ * or fails a structural invariant. Pulled out of `decrypt` itself so
+ * the happy-path of that function stays compact and readable.
+ */
+const assertValidInputs = (
+  secretHash: unknown,
+  encryptedMessage: unknown,
+): void => {
   if (typeof secretHash !== "string" || secretHash.length === 0) {
     throw new Error("decrypt: secretHash must be a non-empty string");
   }
   if (typeof encryptedMessage !== "string") {
     throw new Error("decrypt: encryptedMessage must be a string");
   }
+  if (
+    encryptedMessage.length > 0 &&
+    !isValidHex(encryptedMessage as string)
+  ) {
+    throw new Error("decrypt: encryptedMessage must be a valid hex string");
+  }
+};
+
+/**
+ * Decrypts a hex-encoded message that was encrypted using a XOR cipher
+ * with the given secret hash as the salt.
+ *
+ * @param secretHash - The secret salt used during encryption. Must be a
+ *   non-empty string; the exact contents are opaque to this routine.
+ * @param encryptedMessage - The hex-encoded encrypted payload. An empty
+ *   string is treated as a valid encoding of the empty plaintext.
+ * @returns The decrypted plaintext string.
+ * @throws If `secretHash` is not a non-empty string, if
+ *   `encryptedMessage` is not a string, or if it is a non-empty string
+ *   that is not valid hex.
+ */
+const decrypt = (secretHash: string, encryptedMessage: string): string => {
+  assertValidInputs(secretHash, encryptedMessage);
   if (encryptedMessage.length === 0) {
     return "";
   }
-  if (!isValidHex(encryptedMessage)) {
-    throw new Error("decrypt: encryptedMessage must be a valid hex string");
-  }
-
   return decipher(secretHash)(encryptedMessage);
 };
 
-/** Computes the XOR fold of all UTF-16 char codes in a string in O(n). */
+/**
+ * Computes the XOR fold of all UTF-16 char codes in a string in O(n).
+ *
+ * Because XOR is both associative and commutative, folding the entire
+ * salt once yields a single key byte that is equivalent (per output
+ * position) to XOR-ing against each salt code in turn.
+ */
 const xorCharCodes = (text: string): number => {
   let acc = 0;
   for (let i = 0; i < text.length; i++) {
@@ -38,16 +89,19 @@ const xorCharCodes = (text: string): number => {
   return acc;
 };
 
+/**
+ * Builds a decoding function bound to a particular salt.
+ *
+ * The returned closure precomputes the salt's XOR fold so that decoding
+ * each input byte costs O(1) work, independent of the salt's length.
+ */
 const decipher = (salt: string) => {
-  // Precompute the XOR fold of all salt char codes once; XOR-ing each
-  // input byte against this constant is equivalent to folding it against
-  // every salt code individually, but runs in O(1) per byte.
   const saltXor = xorCharCodes(salt);
   return (encoded: string): string => {
     const len = encoded.length >> 1;
     const chars = new Array<string>(len);
-    for (let i = 0, j = 0; i < len; i++, j += 2) {
-      const code = parseInt(encoded.slice(j, j + 2), 16);
+    for (let i = 0, j = 0; i < len; i++, j += HEX_CHARS_PER_BYTE) {
+      const code = parseInt(encoded.slice(j, j + HEX_CHARS_PER_BYTE), 16);
       chars[i] = String.fromCharCode(code ^ saltXor);
     }
     return chars.join("");
