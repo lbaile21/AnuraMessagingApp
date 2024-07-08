@@ -1,7 +1,15 @@
+/**
+ * A persisted conversation thread, addressable by its token and backed by
+ * an IPFS-hosted message log.
+ */
 export interface Conversation {
+  /** Unique token identifier for the conversation. */
   tokenID: string;
+  /** Hash of the shared secret used to authenticate participants. */
   secretHash: string;
+  /** IPFS endpoint URL where the message history is stored. */
   IPFSendpoint: string;
+  /** Ordered list of messages exchanged within the conversation. */
   messages: Message[];
 }
 
