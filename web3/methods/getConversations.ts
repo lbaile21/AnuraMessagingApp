@@ -1,8 +1,11 @@
 import { Conversation } from "../../interfaces";
 import conversations from "../../conversations.json";
 
+const isValidWallet = (wallet: unknown): wallet is string[] =>
+  Array.isArray(wallet) && wallet.length > 0 && typeof wallet[0] === "string";
+
 const getConversations = async (contract, wallet, ipfs?) => {
-  if (!contract || !wallet || wallet.length === 0) {
+  if (!contract || !isValidWallet(wallet)) {
     return [];
   }
 
@@ -22,12 +25,14 @@ const getConversations = async (contract, wallet, ipfs?) => {
     return [];
   }
 
-  return activeConversations.map(({ secretHash, tokenID, IPFSendpoint }) => ({
-    secretHash,
-    tokenID,
-    IPFSendpoint,
-    messages: conversations[tokenID] || [],
-  }));
+  return activeConversations
+    .filter((c) => c && c.tokenID != null)
+    .map(({ secretHash, tokenID, IPFSendpoint }) => ({
+      secretHash,
+      tokenID,
+      IPFSendpoint,
+      messages: conversations[tokenID] || [],
+    }));
 };
 
 export default getConversations;
