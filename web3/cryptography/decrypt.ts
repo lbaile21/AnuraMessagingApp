@@ -18,6 +18,9 @@ const HEX_PATTERN = /^[0-9a-fA-F]+$/;
 /** Number of hex characters used to encode a single byte. */
 const HEX_CHARS_PER_BYTE = 2;
 
+/** Radix used when parsing hex character pairs into byte values. */
+const HEX_RADIX = 16;
+
 /**
  * Returns `true` when `value` is a well-formed hex string of even length.
  *
@@ -45,10 +48,7 @@ const assertValidInputs = (
   if (typeof encryptedMessage !== "string") {
     throw new Error("decrypt: encryptedMessage must be a string");
   }
-  if (
-    encryptedMessage.length > 0 &&
-    !isValidHex(encryptedMessage as string)
-  ) {
+  if (encryptedMessage.length > 0 && !isValidHex(encryptedMessage)) {
     throw new Error("decrypt: encryptedMessage must be a valid hex string");
   }
 };
@@ -101,7 +101,7 @@ const decipher = (salt: string) => {
     const len = encoded.length >> 1;
     const chars = new Array<string>(len);
     for (let i = 0, j = 0; i < len; i++, j += HEX_CHARS_PER_BYTE) {
-      const code = parseInt(encoded.slice(j, j + HEX_CHARS_PER_BYTE), 16);
+      const code = parseInt(encoded.slice(j, j + HEX_CHARS_PER_BYTE), HEX_RADIX);
       chars[i] = String.fromCharCode(code ^ saltXor);
     }
     return chars.join("");
