@@ -98,7 +98,7 @@ const xorCharCodes = (text: string): number => {
 const decipher = (salt: string) => {
   const saltXor = xorCharCodes(salt);
   return (encoded: string): string => {
-    const len = encoded.length >> 1;
+    const len = encoded.length / HEX_CHARS_PER_BYTE;
     const chars = new Array<string>(len);
     for (let i = 0, j = 0; i < len; i++, j += HEX_CHARS_PER_BYTE) {
       const code = parseInt(encoded.slice(j, j + HEX_CHARS_PER_BYTE), HEX_RADIX);
