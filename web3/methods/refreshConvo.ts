@@ -15,7 +15,7 @@ const mapConversation = ({ secretHash, tokenID, IPFSendpoint }: Conversation) =>
   secretHash,
   tokenID,
   IPFSendpoint,
-  messages: conversations[tokenID] ?? [],
+  messages: conversations[String(tokenID)] ?? [],
 });
 
 /**
@@ -39,7 +39,7 @@ const refreshConvo = async (contract, wallet) => {
     .getMyActiveConversations(wallet)
     .call({ from: wallet });
 
-  return activeConversations.map(mapConversation);
+  return (activeConversations ?? []).map(mapConversation);
 };
 
 export default refreshConvo;
