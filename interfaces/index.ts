@@ -38,6 +38,10 @@ export function isMessage(value: unknown): value is Message {
   const v = value as Record<string, unknown>;
   if (typeof v.sender !== "string" || typeof v.message !== "string") return false;
   if (!isOptionalString(v.receiver) || !isOptionalString(v.ariaLabel)) return false;
-  if (v.timestamp !== undefined && (typeof v.timestamp !== "number" || !Number.isFinite(v.timestamp))) return false;
+  if (v.timestamp !== undefined) {
+    if (typeof v.timestamp !== "number" || !Number.isFinite(v.timestamp) || v.timestamp < 0) {
+      return false;
+    }
+  }
   return true;
 }
