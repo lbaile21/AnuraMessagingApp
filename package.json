@@ -4,11 +4,13 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc",
+    "type-check": "tsc --noEmit",
     "export": "next export",
     "lint": "next lint",
+    "lint:fix": "next lint --fix",
     "clean": "rm -rf .next out",
-    "clean:all": "rm -rf .next out node_modules"
+    "clean:all": "rm -rf .next out node_modules",
+    "prebuild": "npm run type-check"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.4.0",
@@ -20,7 +22,6 @@
     "eth-crypto": "^2.2.0",
     "ethers": "^5.6.0",
     "framer-motion": "^4",
-    "fs": "^0.0.1-security",
     "http-server": "^14.1.0",
     "mime": "^3.0.0",
     "minimist": "^1.2.5",
