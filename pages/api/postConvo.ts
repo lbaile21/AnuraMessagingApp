@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import previousConversations from "../../conversations.json";
 import fs from "fs";
+import path from "path";
 
 /**
  * POST /api/postConvo
@@ -26,6 +27,17 @@ import fs from "fs";
  *   - 400 if `tokenID` or `message` is missing/invalid
  *   - 500 (or `err.status`) for any unexpected failure
  */
+const CONVERSATIONS_PATH = path.join(process.cwd(), "conversations.json");
+
+const getFileSizeInMB = (filePath: string): number => {
+  try {
+    const stats = fs.statSync(filePath);
+    return stats.size / (1024 * 1024);
+  } catch {
+    return 0;
+  }
+};
+
 const postConversation = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     if (req.method !== "POST") {
@@ -51,12 +63,10 @@ const postConversation = async (req: NextApiRequest, res: NextApiResponse) => {
     const jsonString = JSON.stringify(conversations);
 
     // Measure the on-disk size of the store before writing the update.
-    const stats = fs.statSync(`./conversations.json`);
-    const fileSizeInBytes = stats.size;
-    const fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
+    const fileSizeInMegabytes = getFileSizeInMB(CONVERSATIONS_PATH);
 
     // Persist the updated conversations map back to disk.
-    fs.writeFile(`./conversations.json`, jsonString, (err) => {
+    fs.writeFile(CONVERSATIONS_PATH, jsonString, (err) => {
       if (err) {
         console.log("Error writing file", err);
       } else {
