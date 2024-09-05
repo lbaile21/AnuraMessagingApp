@@ -37,6 +37,10 @@ const isValidHex = (value: string): boolean =>
  * Throws a descriptive `Error` if either argument is of the wrong type
  * or fails a structural invariant. Pulled out of `decrypt` itself so
  * the happy-path of that function stays compact and readable.
+ *
+ * Error messages are phrased to name the offending parameter explicitly
+ * so that screen-reader users and log readers can locate the problem
+ * without consulting the source.
  */
 const assertValidInputs = (
   secretHash: unknown,
