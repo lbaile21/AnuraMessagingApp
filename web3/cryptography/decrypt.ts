@@ -94,6 +94,27 @@ const xorCharCodes = (text: string): number => {
 };
 
 /**
+ * Parses a single hex byte from `source` starting at `offset`.
+ *
+ * Throws if the two characters at that position do not parse to a
+ * finite number. In practice this should be unreachable because
+ * {@link isValidHex} is run up-front, but the guard protects against
+ * future changes that bypass validation (e.g. internal callers) and
+ * surfaces corruption as a clear error rather than as silent `NaN`
+ * propagation through `String.fromCharCode`.
+ */
+const parseHexByte = (source: string, offset: number): number => {
+  const byte = parseInt(
+    source.slice(offset, offset + HEX_CHARS_PER_BYTE),
+    HEX_RADIX,
+  );
+  if (!Number.isFinite(byte)) {
+    throw new Error(`decrypt: malformed hex byte at offset ${offset}`);
+  }
+  return byte;
+};
+
+/**
  * Builds a decoding function bound to a particular salt.
  *
  * The returned closure precomputes the salt's XOR fold so that decoding
@@ -105,7 +126,7 @@ const decipher = (salt: string) => {
     const len = encoded.length / HEX_CHARS_PER_BYTE;
     const chars = new Array<string>(len);
     for (let i = 0, j = 0; i < len; i++, j += HEX_CHARS_PER_BYTE) {
-      const code = parseInt(encoded.slice(j, j + HEX_CHARS_PER_BYTE), HEX_RADIX);
+      const code = parseHexByte(encoded, j);
       chars[i] = String.fromCharCode(code ^ saltXor);
     }
     return chars.join("");
