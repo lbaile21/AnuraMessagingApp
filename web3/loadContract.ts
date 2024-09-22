@@ -1,6 +1,8 @@
 import Web3 from "web3";
 
-const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+const DEFAULT_PROVIDER_URL = "ws://localhost:8545";
+
+const web3 = new Web3(Web3.givenProvider || DEFAULT_PROVIDER_URL);
 export { web3 };
 
 export const CONTRACT_ADDRESS = "0x4fDc5487D4769D5ac6b68041BBB5C83e45dc8476";
