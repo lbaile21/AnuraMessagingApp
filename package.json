@@ -10,7 +10,7 @@
     "lint:fix": "next lint --fix",
     "clean": "rm -rf .next out",
     "clean:all": "rm -rf .next out node_modules",
-    "prebuild": "npm run type-check"
+    "prebuild": "npm run type-check && npm run lint"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.4.0",
