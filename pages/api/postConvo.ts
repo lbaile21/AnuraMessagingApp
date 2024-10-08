@@ -60,10 +60,10 @@ const validatePayload = (
   tokenID: unknown,
   message: unknown
 ): string | null => {
-  if (typeof tokenID !== "string" || tokenID.length === 0) {
+  if (typeof tokenID !== "string" || tokenID.trim().length === 0) {
     return "Missing or invalid tokenID";
   }
-  if (message === undefined) {
+  if (message === undefined || message === null) {
     return "Missing message payload";
   }
   return null;
