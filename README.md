@@ -65,7 +65,8 @@ metadata encodes the payload, sender, and recipient.
 The following variables are read from `.env.local`:
 
 - `NEXT_PUBLIC_RPC_URL` — JSON-RPC endpoint used by the client to read on-chain
-  state. Any standard EVM-compatible RPC will work.
+  state. Prefer a low-latency provider (or a local node) since inbox views fan
+  out several read calls per render. Any standard EVM-compatible RPC will work.
 - `NEXT_PUBLIC_CONTRACT_ADDRESS` — deployed address of the `AnuraMessagingApp`
   ERC-1155 contract.
 - `NEXT_PUBLIC_CHAIN_ID` *(optional)* — expected chain id; if set, the UI will
