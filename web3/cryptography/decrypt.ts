@@ -123,10 +123,10 @@ const parseHexByte = (source: string, offset: number): number => {
 const decipher = (salt: string) => {
   const saltXor = xorCharCodes(salt);
   return (encoded: string): string => {
-    const len = encoded.length / HEX_CHARS_PER_BYTE;
-    const chars = new Array<string>(len);
-    for (let i = 0, j = 0; i < len; i++, j += HEX_CHARS_PER_BYTE) {
-      const code = parseHexByte(encoded, j);
+    const byteCount = encoded.length / HEX_CHARS_PER_BYTE;
+    const chars = new Array<string>(byteCount);
+    for (let i = 0, offset = 0; i < byteCount; i++, offset += HEX_CHARS_PER_BYTE) {
+      const code = parseHexByte(encoded, offset);
       chars[i] = String.fromCharCode(code ^ saltXor);
     }
     return chars.join("");
