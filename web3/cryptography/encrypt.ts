@@ -9,7 +9,7 @@
  * @param message - Plaintext message to encrypt.
  * @returns Hex-encoded encrypted string. Pair with `decrypt` to recover the plaintext.
  */
-const encrypt = (secretHash, message): string => {
+const encrypt = (secretHash: string, message: string): string => {
   const cipher = (salt) => {
     const textToChars = (text) => text.split("").map((c) => c.charCodeAt(0));
     const byteHex = (n) => ("0" + Number(n).toString(16)).slice(-2);
