@@ -90,11 +90,19 @@ const withTimeout = (input, init, timeoutMs) => {
   );
 };
 
+const resolveTimeout = (options) => {
+  const raw = options && options.timeoutMs;
+  if (typeof raw !== "number" || !Number.isFinite(raw) || raw <= 0) {
+    return DEFAULT_REQUEST_TIMEOUT_MS;
+  }
+  return raw;
+};
+
 const sendMessage = async (convo, currentMessage, options = {}) => {
   assertValidConvo(convo);
   assertValidMessage(currentMessage);
 
-  const timeoutMs = options.timeoutMs || DEFAULT_REQUEST_TIMEOUT_MS;
+  const timeoutMs = resolveTimeout(options);
 
   let response;
   try {
