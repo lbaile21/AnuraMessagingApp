@@ -22,6 +22,9 @@ const fetchActiveConversations = async (
   }
 };
 
+const getMessagesForToken = (tokenID: string | number) =>
+  conversations[tokenID] || [];
+
 const getConversations = async (contract, wallet, ipfs?) => {
   if (!contract || !isValidWallet(wallet)) {
     return [];
@@ -36,7 +39,7 @@ const getConversations = async (contract, wallet, ipfs?) => {
       secretHash,
       tokenID,
       IPFSendpoint,
-      messages: conversations[tokenID] || [],
+      messages: getMessagesForToken(tokenID),
     }));
 };
 
