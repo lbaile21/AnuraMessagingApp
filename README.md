@@ -87,3 +87,9 @@ The following variables are read from `.env.local`:
 Unit tests live alongside their source files under `__tests__/` directories and
 are executed with Jest. Run the full suite with `npm test`, or use
 `npm run test:watch` to re-run tests as files change.
+
+### Accessibility
+
+Interactive elements (compose form, inbox list, network-switch prompt) are
+keyboard navigable and expose ARIA labels for screen readers. When contributing
+UI changes, please verify focus order and color contrast against WCAG 2.1 AA.
