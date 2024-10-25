@@ -7,13 +7,7 @@ export { web3 };
 
 export const CONTRACT_ADDRESS = "0x4fDc5487D4769D5ac6b68041BBB5C83e45dc8476";
 
-/**
- * Instantiates the MessagingToken contract at {@link CONTRACT_ADDRESS}.
- * Returns a web3 Contract instance ready for read/write calls.
- */
-const loadContract = async () => {
-  const contract = new web3.eth.Contract(
-    [
+const MESSAGING_TOKEN_ABI = [
       {
         inputs: [],
         stateMutability: "nonpayable",
@@ -595,9 +589,13 @@ const loadContract = async () => {
         stateMutability: "view",
         type: "function",
       },
-    ],
-    CONTRACT_ADDRESS
-  );
-  return contract;
+    ];
+
+/**
+ * Instantiates the MessagingToken contract at {@link CONTRACT_ADDRESS}.
+ * Returns a web3 Contract instance ready for read/write calls.
+ */
+const loadContract = async () => {
+  return new web3.eth.Contract(MESSAGING_TOKEN_ABI, CONTRACT_ADDRESS);
 };
 export default loadContract;
