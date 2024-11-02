@@ -22,9 +22,13 @@ const mapConversation = ({ secretHash, tokenID, IPFSendpoint }: Conversation) =>
  * Fetches the caller's active conversations from the contract and hydrates
  * each one with locally cached messages.
  *
+ * The contract call is scoped to `wallet` via the `from` field so that
+ * `msg.sender`-gated views resolve correctly. A `null`/`undefined` response
+ * from the contract is treated as an empty list rather than an error.
+ *
  * @param contract - A web3 contract instance exposing `getMyActiveConversations`.
  * @param wallet  - The address of the wallet whose conversations should be loaded.
- * @returns A list of UI-ready conversation objects.
+ * @returns A list of UI-ready conversation objects, one per active conversation.
  * @throws If either `contract` or `wallet` is missing.
  */
 const refreshConvo = async (contract, wallet) => {
