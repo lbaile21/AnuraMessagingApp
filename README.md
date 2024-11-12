@@ -68,8 +68,8 @@ The following variables are read from `.env.local`:
   state. Prefer a low-latency provider (or a local node) since inbox views fan
   out several read calls per render. Any standard EVM-compatible RPC will work.
 - `NEXT_PUBLIC_CONTRACT_ADDRESS` — deployed address of the `AnuraMessagingApp`
-  ERC-1155 contract. Must be a checksummed 0x-prefixed 20-byte address;
-  malformed values will cause client initialization to throw at startup.
+  ERC-1155 contract. Must be a checksummed, 0x-prefixed 20-byte address;
+  malformed values cause client initialization to throw at startup.
 - `NEXT_PUBLIC_CHAIN_ID` *(optional)* — expected chain id; if set, the UI will
   prompt the user to switch networks when their wallet is connected elsewhere.
 
