@@ -8,8 +8,10 @@
     "export": "next export",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "clean": "rm -rf .next out",
-    "clean:all": "rm -rf .next out node_modules",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "clean": "rimraf .next out",
+    "clean:all": "rimraf .next out node_modules",
     "prebuild": "npm run type-check && npm run lint"
   },
   "dependencies": {
@@ -39,6 +41,8 @@
     "@types/node": "^12.12.21",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
+    "prettier": "^2.6.2",
+    "rimraf": "^3.0.2",
     "typescript": "4.0"
   },
   "engines": {
