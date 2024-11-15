@@ -92,4 +92,6 @@ are executed with Jest. Run the full suite with `npm test`, or use
 
 Interactive elements (compose form, inbox list, network-switch prompt) are
 keyboard navigable and expose ARIA labels for screen readers. When contributing
-UI changes, please verify focus order and color contrast against WCAG 2.1 AA.
+UI changes, please verify focus order and color contrast against WCAG 2.1 AA,
+and test the flow end-to-end with a screen reader (VoiceOver or NVDA) using
+keyboard-only input.
