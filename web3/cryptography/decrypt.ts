@@ -97,18 +97,18 @@ const xorCharCodes = (text: string): number => {
  * Parses a single hex byte from `source` starting at `offset`.
  *
  * Throws if the two characters at that position do not parse to a
- * finite number. In practice this should be unreachable because
- * {@link isValidHex} is run up-front, but the guard protects against
- * future changes that bypass validation (e.g. internal callers) and
- * surfaces corruption as a clear error rather than as silent `NaN`
- * propagation through `String.fromCharCode`.
+ * finite number in the valid byte range [0, 255]. In practice this
+ * should be unreachable because {@link isValidHex} is run up-front,
+ * but the guard protects against future changes that bypass validation
+ * (e.g. internal callers) and surfaces corruption as a clear error
+ * rather than as silent `NaN` propagation through `String.fromCharCode`.
  */
 const parseHexByte = (source: string, offset: number): number => {
   const byte = parseInt(
     source.slice(offset, offset + HEX_CHARS_PER_BYTE),
     HEX_RADIX,
   );
-  if (!Number.isFinite(byte)) {
+  if (!Number.isInteger(byte) || byte < 0 || byte > 0xff) {
     throw new Error(`decrypt: malformed hex byte at offset ${offset}`);
   }
   return byte;
