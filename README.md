@@ -95,3 +95,27 @@ keyboard navigable and expose ARIA labels for screen readers. When contributing
 UI changes, please verify focus order and color contrast against WCAG 2.1 AA,
 and test the flow end-to-end with a screen reader (VoiceOver or NVDA) using
 keyboard-only input.
+
+### Performance notes
+
+Inbox rendering can become read-heavy as the number of tokens per address
+grows, so the client is structured to keep RPC traffic predictable:
+
+- **Batch reads.** Prefer `balanceOfBatch` and multicall-style aggregation over
+  per-token `balanceOf` calls. A single batched request for N tokens is almost
+  always cheaper than N round-trips, even against a local node.
+- **Cache message metadata.** Token URIs and decoded payloads are immutable
+  once minted; cache them by token id in memory (and optionally in
+  `localStorage`) so re-renders and route changes do not re-fetch them.
+- **Paginate the inbox.** Render messages in pages of 25–50 and fetch the next
+  page on demand. Avoid unbounded `Promise.all` fan-out over the full history.
+- **Debounce wallet-driven refreshes.** Account, chain, and block subscriptions
+  can fire in bursts; coalesce them with a short debounce (≈150 ms) before
+  triggering a refetch.
+- **Memoize derived views.** Wrap expensive list transforms (sorting, grouping
+  by thread, address checksumming) in `useMemo` keyed on the raw message
+  array so they only recompute when inputs actually change.
+
+When profiling, the React DevTools Profiler and the browser's network tab
+(filtered to the RPC endpoint) together give a good picture of where time is
+spent between render work and on-chain reads.
