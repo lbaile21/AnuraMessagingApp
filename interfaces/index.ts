@@ -13,6 +13,12 @@ export interface Conversation {
   messages: Message[];
 }
 
+/**
+ * A single message exchanged within a {@link Conversation}.
+ *
+ * Only `sender` and `message` are required; the remaining fields are
+ * metadata used for routing, accessibility, and ordering.
+ */
 export interface Message {
   /** Address or identifier of the message sender. */
   sender: string;
@@ -22,7 +28,10 @@ export interface Message {
   receiver?: string;
   /** Optional ARIA label for assistive technologies. */
   ariaLabel?: string;
-  /** Optional ARIA role hint (e.g. "status", "alert", "log"). */
+  /**
+   * Optional ARIA role hint (e.g. "status", "alert", "log").
+   * Consumers should treat unknown roles as advisory only.
+   */
   ariaRole?: string;
   /** Optional unix timestamp (ms) indicating when the message was created. */
   timestamp?: number;
@@ -39,6 +48,9 @@ const isValidTimestamp = (v: unknown): boolean => {
 /**
  * Type guard that verifies whether an arbitrary value conforms to the
  * {@link Message} interface shape at runtime.
+ *
+ * @param value - Candidate value, typically parsed from untrusted JSON.
+ * @returns `true` when `value` satisfies the {@link Message} contract.
  */
 export function isMessage(value: unknown): value is Message {
   if (!value || typeof value !== "object") return false;
@@ -54,6 +66,12 @@ export function isMessage(value: unknown): value is Message {
  * Returns an accessible description for a message, preferring an explicit
  * `ariaLabel` when provided and falling back to a sender-prefixed summary
  * suitable for screen readers.
+ *
+ * @example
+ * ```ts
+ * getAccessibleLabel({ sender: "alice", message: "hi" });
+ * // => "Message from alice: hi"
+ * ```
  */
 export function getAccessibleLabel(message: Message): string {
   if (message.ariaLabel && message.ariaLabel.trim().length > 0) {
