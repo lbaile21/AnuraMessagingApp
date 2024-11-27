@@ -29,7 +29,8 @@ const mapConversation = ({ secretHash, tokenID, IPFSendpoint }: Conversation) =>
  * @param contract - A web3 contract instance exposing `getMyActiveConversations`.
  * @param wallet  - The address of the wallet whose conversations should be loaded.
  * @returns A list of UI-ready conversation objects, one per active conversation.
- * @throws If either `contract` or `wallet` is missing.
+ * @throws If either `contract` or `wallet` is missing, or if the underlying
+ *   contract call rejects (errors are propagated to the caller unchanged).
  */
 const refreshConvo = async (contract, wallet) => {
   if (!contract) {
