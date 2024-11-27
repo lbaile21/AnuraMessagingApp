@@ -2,6 +2,17 @@ import { Conversation } from "../../interfaces";
 import conversations from "../../conversations.json";
 
 /**
+ * Looks up any locally cached messages for a given NFT token identifier.
+ *
+ * The cache is keyed by the stringified `tokenID` so that numeric and
+ * `BigNumber`-like values returned by web3 both resolve to the same entry.
+ * Returns an empty array when no cached thread exists, ensuring callers
+ * always receive an iterable value safe for rendering.
+ */
+const getCachedMessages = (tokenID: Conversation["tokenID"]) =>
+  conversations[String(tokenID)] ?? [];
+
+/**
  * Projects an on-chain {@link Conversation} onto the shape consumed by the UI,
  * attaching any locally cached messages keyed by `tokenID`.
  *
@@ -15,7 +26,7 @@ const mapConversation = ({ secretHash, tokenID, IPFSendpoint }: Conversation) =>
   secretHash,
   tokenID,
   IPFSendpoint,
-  messages: conversations[String(tokenID)] ?? [],
+  messages: getCachedMessages(tokenID),
 });
 
 /**
