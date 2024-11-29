@@ -72,6 +72,7 @@ The following variables are read from `.env.local`:
   malformed values cause client initialization to throw at startup.
 - `NEXT_PUBLIC_CHAIN_ID` *(optional)* — expected chain id; if set, the UI will
   prompt the user to switch networks when their wallet is connected elsewhere.
+  Accepts a decimal integer (e.g. `1` for mainnet, `11155111` for Sepolia).
 
 ### Scripts
 
