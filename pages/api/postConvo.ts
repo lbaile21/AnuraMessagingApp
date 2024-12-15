@@ -29,6 +29,7 @@ import path from "path";
  */
 const CONVERSATIONS_PATH = path.join(process.cwd(), "conversations.json");
 const BYTES_PER_MB = 1024 * 1024;
+const MAX_TOKEN_ID_LENGTH = 256;
 
 const getFileSizeInMB = (filePath: string): number => {
   try {
@@ -62,6 +63,9 @@ const validatePayload = (
 ): string | null => {
   if (typeof tokenID !== "string" || tokenID.trim().length === 0) {
     return "Missing or invalid tokenID";
+  }
+  if (tokenID.length > MAX_TOKEN_ID_LENGTH) {
+    return "tokenID exceeds maximum allowed length";
   }
   if (message === undefined || message === null) {
     return "Missing message payload";
