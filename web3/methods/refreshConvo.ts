@@ -2,15 +2,20 @@ import { Conversation } from "../../interfaces";
 import conversations from "../../conversations.json";
 
 /**
+ * Normalises a `tokenID` value to the string key used by the local message
+ * cache. Centralising the conversion ensures that numeric literals, decimal
+ * strings and `BigNumber`-like values from web3 all resolve consistently.
+ */
+const cacheKey = (tokenID: Conversation["tokenID"]) => String(tokenID);
+
+/**
  * Looks up any locally cached messages for a given NFT token identifier.
  *
- * The cache is keyed by the stringified `tokenID` so that numeric and
- * `BigNumber`-like values returned by web3 both resolve to the same entry.
  * Returns an empty array when no cached thread exists, ensuring callers
  * always receive an iterable value safe for rendering.
  */
 const getCachedMessages = (tokenID: Conversation["tokenID"]) =>
-  conversations[String(tokenID)] ?? [];
+  conversations[cacheKey(tokenID)] ?? [];
 
 /**
  * Projects an on-chain {@link Conversation} onto the shape consumed by the UI,
@@ -49,6 +54,11 @@ const refreshConvo = async (contract, wallet) => {
   }
   if (!wallet) {
     throw new Error("refreshConvo requires a wallet address");
+  }
+  if (!contract.methods?.getMyActiveConversations) {
+    throw new Error(
+      "refreshConvo: contract is missing getMyActiveConversations",
+    );
   }
 
   const activeConversations: Conversation[] = await contract.methods
