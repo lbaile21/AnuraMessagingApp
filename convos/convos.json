@@ -1,18 +1,42 @@
 [
   {
     "sender": "0x312dasdas",
-    "message": "Hello there"
+    "message": "Hello there",
+    "timestamp": "2024-01-15T09:00:00Z",
+    "accessibility": {
+      "altText": "Greeting message from user 0x312dasdas",
+      "language": "en",
+      "readingLevel": "basic"
+    }
   },
   {
     "sender": "0x9fa8b21c",
-    "message": "Hi, how are you?"
+    "message": "Hi, how are you?",
+    "timestamp": "2024-01-15T09:00:12Z",
+    "accessibility": {
+      "altText": "Question asking about wellbeing from user 0x9fa8b21c",
+      "language": "en",
+      "readingLevel": "basic"
+    }
   },
   {
     "sender": "0x312dasdas",
-    "message": "Doing well, thanks for asking!"
+    "message": "Doing well, thanks for asking!",
+    "timestamp": "2024-01-15T09:00:25Z",
+    "accessibility": {
+      "altText": "Positive response about wellbeing from user 0x312dasdas",
+      "language": "en",
+      "readingLevel": "basic"
+    }
   },
   {
     "sender": "0x9fa8b21c",
-    "message": "Glad to hear it!"
+    "message": "Glad to hear it!",
+    "timestamp": "2024-01-15T09:00:38Z",
+    "accessibility": {
+      "altText": "Affirmative friendly reply from user 0x9fa8b21c",
+      "language": "en",
+      "readingLevel": "basic"
+    }
   }
 ]
