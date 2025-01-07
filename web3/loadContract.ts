@@ -2,7 +2,14 @@ import Web3 from "web3";
 
 const DEFAULT_PROVIDER_URL = "ws://localhost:8545";
 
-const web3 = new Web3(Web3.givenProvider || DEFAULT_PROVIDER_URL);
+/**
+ * Resolve the provider to use for the web3 instance.
+ * Prefers an injected provider (e.g. MetaMask) and falls back
+ * to a local node websocket endpoint for development.
+ */
+const resolveProvider = () => Web3.givenProvider || DEFAULT_PROVIDER_URL;
+
+const web3 = new Web3(resolveProvider());
 export { web3 };
 
 export const CONTRACT_ADDRESS = "0x4fDc5487D4769D5ac6b68041BBB5C83e45dc8476";
@@ -591,11 +598,16 @@ const MESSAGING_TOKEN_ABI = [
       },
     ];
 
+export { MESSAGING_TOKEN_ABI };
+
 /**
  * Instantiates the MessagingToken contract at {@link CONTRACT_ADDRESS}.
  * Returns a web3 Contract instance ready for read/write calls.
+ *
+ * Optionally accepts an override address, which is useful for tests or
+ * when interacting with a redeployed contract on a different network.
  */
-const loadContract = async () => {
-  return new web3.eth.Contract(MESSAGING_TOKEN_ABI, CONTRACT_ADDRESS);
+const loadContract = async (address: string = CONTRACT_ADDRESS) => {
+  return new web3.eth.Contract(MESSAGING_TOKEN_ABI, address);
 };
 export default loadContract;
