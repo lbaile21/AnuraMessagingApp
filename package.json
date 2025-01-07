@@ -8,6 +8,7 @@
     "export": "next export",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
+    "lint:a11y": "next lint --dir pages --dir components",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "clean": "rimraf .next out",
