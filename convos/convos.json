@@ -6,7 +6,9 @@
     "accessibility": {
       "altText": "Greeting message from user 0x312dasdas",
       "language": "en",
-      "readingLevel": "basic"
+      "readingLevel": "basic",
+      "sentiment": "neutral",
+      "messageType": "greeting"
     }
   },
   {
@@ -16,7 +18,9 @@
     "accessibility": {
       "altText": "Question asking about wellbeing from user 0x9fa8b21c",
       "language": "en",
-      "readingLevel": "basic"
+      "readingLevel": "basic",
+      "sentiment": "friendly",
+      "messageType": "question"
     }
   },
   {
@@ -26,7 +30,9 @@
     "accessibility": {
       "altText": "Positive response about wellbeing from user 0x312dasdas",
       "language": "en",
-      "readingLevel": "basic"
+      "readingLevel": "basic",
+      "sentiment": "positive",
+      "messageType": "response"
     }
   },
   {
@@ -36,7 +42,9 @@
     "accessibility": {
       "altText": "Affirmative friendly reply from user 0x9fa8b21c",
       "language": "en",
-      "readingLevel": "basic"
+      "readingLevel": "basic",
+      "sentiment": "positive",
+      "messageType": "acknowledgement"
     }
   }
 ]
