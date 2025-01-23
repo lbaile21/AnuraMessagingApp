@@ -596,18 +596,19 @@ const MESSAGING_TOKEN_ABI = [
         stateMutability: "view",
         type: "function",
       },
-    ];
+    ] as const;
 
 export { MESSAGING_TOKEN_ABI };
 
 /**
- * Instantiates the MessagingToken contract at {@link CONTRACT_ADDRESS}.
- * Returns a web3 Contract instance ready for read/write calls.
+ * Instantiates the MessagingToken contract at the given address
+ * (defaults to {@link CONTRACT_ADDRESS}). Returns a web3 Contract
+ * instance ready for read/write calls.
  *
- * Optionally accepts an override address, which is useful for tests or
- * when interacting with a redeployed contract on a different network.
+ * An override address is useful for tests or when interacting with
+ * a redeployed contract on a different network.
  */
-const loadContract = async (address: string = CONTRACT_ADDRESS) => {
-  return new web3.eth.Contract(MESSAGING_TOKEN_ABI, address);
-};
+const loadContract = (address: string = CONTRACT_ADDRESS) =>
+  new web3.eth.Contract(MESSAGING_TOKEN_ABI as any, address);
+
 export default loadContract;
