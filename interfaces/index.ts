@@ -37,13 +37,14 @@ export interface Message {
   timestamp?: number;
 }
 
+const isNonEmptyString = (v: unknown): v is string =>
+  typeof v === "string" && v.length > 0;
+
 const isOptionalString = (v: unknown): boolean =>
   v === undefined || typeof v === "string";
 
-const isValidTimestamp = (v: unknown): boolean => {
-  if (v === undefined) return true;
-  return typeof v === "number" && Number.isFinite(v) && v >= 0;
-};
+const isValidTimestamp = (v: unknown): boolean =>
+  v === undefined || (typeof v === "number" && Number.isFinite(v) && v >= 0);
 
 /**
  * Type guard that verifies whether an arbitrary value conforms to the
@@ -55,11 +56,14 @@ const isValidTimestamp = (v: unknown): boolean => {
 export function isMessage(value: unknown): value is Message {
   if (!value || typeof value !== "object") return false;
   const v = value as Record<string, unknown>;
-  if (typeof v.sender !== "string" || typeof v.message !== "string") return false;
-  if (!isOptionalString(v.receiver)) return false;
-  if (!isOptionalString(v.ariaLabel) || !isOptionalString(v.ariaRole)) return false;
-  if (!isValidTimestamp(v.timestamp)) return false;
-  return true;
+  return (
+    isNonEmptyString(v.sender) &&
+    typeof v.message === "string" &&
+    isOptionalString(v.receiver) &&
+    isOptionalString(v.ariaLabel) &&
+    isOptionalString(v.ariaRole) &&
+    isValidTimestamp(v.timestamp)
+  );
 }
 
 /**
@@ -74,8 +78,7 @@ export function isMessage(value: unknown): value is Message {
  * ```
  */
 export function getAccessibleLabel(message: Message): string {
-  if (message.ariaLabel && message.ariaLabel.trim().length > 0) {
-    return message.ariaLabel;
-  }
+  const label = message.ariaLabel?.trim();
+  if (label) return label;
   return `Message from ${message.sender}: ${message.message}`;
 }
