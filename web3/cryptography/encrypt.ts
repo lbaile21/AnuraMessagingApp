@@ -5,9 +5,10 @@
  * for use as a cryptographically secure encryption primitive. Prefer
  * a vetted library (e.g. WebCrypto) for any security-sensitive data.
  *
- * @param secretHash - Key used to derive the XOR salt.
- * @param message - Plaintext message to encrypt.
- * @returns Hex-encoded encrypted string. Pair with `decrypt` to recover the plaintext.
+ * @param secretHash - Key used to derive the XOR salt. Must be a non-empty string.
+ * @param message - Plaintext message to encrypt. May be empty (returns an empty string).
+ * @returns Hex-encoded encrypted string (lowercase, two hex chars per input character).
+ *          Pair with `decrypt` using the same `secretHash` to recover the plaintext.
  */
 const encrypt = (secretHash: string, message: string): string => {
   const cipher = (salt) => {
