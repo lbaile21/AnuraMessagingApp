@@ -39,7 +39,7 @@ const assertArgs = (contract: any, wallet: unknown) => {
   if (!contract) {
     throw new Error("refreshConvo requires a contract instance");
   }
-  if (!wallet || typeof wallet !== "string") {
+  if (!wallet || typeof wallet !== "string" || wallet.trim() === "") {
     throw new Error("refreshConvo requires a wallet address");
   }
   if (!contract.methods?.getMyActiveConversations) {
