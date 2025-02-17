@@ -67,6 +67,8 @@ The following variables are read from `.env.local`:
 - `NEXT_PUBLIC_RPC_URL` — JSON-RPC endpoint used by the client to read on-chain
   state. Prefer a low-latency provider (or a local node) since inbox views fan
   out several read calls per render. Any standard EVM-compatible RPC will work.
+  Both `http(s)://` and `ws(s)://` schemes are accepted; other schemes are
+  rejected at startup.
 - `NEXT_PUBLIC_CONTRACT_ADDRESS` — deployed address of the `AnuraMessagingApp`
   ERC-1155 contract. Must be a checksummed, 0x-prefixed 20-byte address;
   malformed values cause client initialization to throw at startup.
