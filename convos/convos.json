@@ -5,10 +5,12 @@
     "timestamp": "2024-01-15T09:00:00Z",
     "accessibility": {
       "altText": "Greeting message from user 0x312dasdas",
+      "ariaLabel": "Message 1: greeting",
       "language": "en",
       "readingLevel": "basic",
       "sentiment": "neutral",
-      "messageType": "greeting"
+      "messageType": "greeting",
+      "screenReaderHint": "Start of conversation"
     }
   },
   {
@@ -17,10 +19,12 @@
     "timestamp": "2024-01-15T09:00:12Z",
     "accessibility": {
       "altText": "Question asking about wellbeing from user 0x9fa8b21c",
+      "ariaLabel": "Message 2: question",
       "language": "en",
       "readingLevel": "basic",
       "sentiment": "friendly",
-      "messageType": "question"
+      "messageType": "question",
+      "screenReaderHint": "Reply expected"
     }
   },
   {
@@ -29,6 +33,7 @@
     "timestamp": "2024-01-15T09:00:25Z",
     "accessibility": {
       "altText": "Positive response about wellbeing from user 0x312dasdas",
+      "ariaLabel": "Message 3: response",
       "language": "en",
       "readingLevel": "basic",
       "sentiment": "positive",
@@ -41,10 +46,12 @@
     "timestamp": "2024-01-15T09:00:38Z",
     "accessibility": {
       "altText": "Affirmative friendly reply from user 0x9fa8b21c",
+      "ariaLabel": "Message 4: acknowledgement",
       "language": "en",
       "readingLevel": "basic",
       "sentiment": "positive",
-      "messageType": "acknowledgement"
+      "messageType": "acknowledgement",
+      "screenReaderHint": "End of exchange"
     }
   }
 ]
