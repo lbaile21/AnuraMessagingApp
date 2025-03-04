@@ -4,6 +4,9 @@ const POST_CONVO_ENDPOINT = "/api/postConvo";
 const MAX_MESSAGE_LENGTH = 4096;
 const LIVE_REGION_TTL_MS = 1000;
 const DEFAULT_REQUEST_TIMEOUT_MS = 15000;
+const DEFAULT_RETRY_ATTEMPTS = 2;
+const RETRY_BASE_DELAY_MS = 250;
+const RETRYABLE_STATUS_CODES = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 const isNonEmptyString = (value) =>
   typeof value === "string" && value.trim().length > 0;
@@ -98,35 +101,85 @@ const resolveTimeout = (options) => {
   return raw;
 };
 
+const resolveRetryAttempts = (options) => {
+  const raw = options && options.retryAttempts;
+  if (typeof raw !== "number" || !Number.isFinite(raw) || raw < 0) {
+    return DEFAULT_RETRY_ATTEMPTS;
+  }
+  return Math.floor(raw);
+};
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Compute an exponential backoff delay with light jitter so concurrent
+ * retries do not stampede the server in lockstep.
+ */
+const backoffDelay = (attempt) => {
+  const exponential = RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
+  const jitter = Math.random() * RETRY_BASE_DELAY_MS;
+  return exponential + jitter;
+};
+
+const isRetryableError = (err) => {
+  if (!err) return false;
+  if (err.name === "AbortError") return true;
+  return err instanceof TypeError;
+};
+
 const sendMessage = async (convo, currentMessage, options = {}) => {
   assertValidConvo(convo);
   assertValidMessage(currentMessage);
 
   const timeoutMs = resolveTimeout(options);
+  const maxAttempts = resolveRetryAttempts(options) + 1;
+  const body = buildPayload(convo, currentMessage);
 
-  let response;
-  try {
-    response = await withTimeout(
-      POST_CONVO_ENDPOINT,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: buildPayload(convo, currentMessage),
-      },
-      timeoutMs
-    );
-  } catch (err) {
-    announceToScreenReader("Message failed to send.", "assertive");
-    throw err;
-  }
+  let lastError;
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    let response;
+    try {
+      response = await withTimeout(
+        POST_CONVO_ENDPOINT,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body,
+        },
+        timeoutMs
+      );
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxAttempts - 1 && isRetryableError(err)) {
+        await delay(backoffDelay(attempt));
+        continue;
+      }
+      announceToScreenReader("Message failed to send.", "assertive");
+      throw err;
+    }
 
-  if (!response.ok) {
+    if (response.ok) {
+      announceToScreenReader("Message sent.");
+      return response;
+    }
+
+    if (
+      attempt < maxAttempts - 1 &&
+      RETRYABLE_STATUS_CODES.has(response.status)
+    ) {
+      lastError = new Error(
+        `Failed to send message (status ${response.status})`
+      );
+      await delay(backoffDelay(attempt));
+      continue;
+    }
+
     announceToScreenReader("Message failed to send.", "assertive");
     throw new Error(`Failed to send message (status ${response.status})`);
   }
 
-  announceToScreenReader("Message sent.");
-  return response;
+  announceToScreenReader("Message failed to send.", "assertive");
+  throw lastError || new Error("sendMessage: exhausted retry attempts");
 };
 
 export default sendMessage;
