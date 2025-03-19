@@ -80,5 +80,6 @@ export function isMessage(value: unknown): value is Message {
 export function getAccessibleLabel(message: Message): string {
   const label = message.ariaLabel?.trim();
   if (label) return label;
-  return `Message from ${message.sender}: ${message.message}`;
+  const body = message.message.trim() || "(empty message)";
+  return `Message from ${message.sender}: ${body}`;
 }
