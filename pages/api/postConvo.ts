@@ -87,8 +87,10 @@ const postConversation = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(400).json({ err: validationError });
     }
 
-    // Merge the new entry into the existing conversations map.
-    const conversations = { ...previousConversations, [tokenID]: message };
+    // Merge the new entry into the existing conversations map, using the
+    // trimmed tokenID as the canonical key.
+    const key = (tokenID as string).trim();
+    const conversations = { ...previousConversations, [key]: message };
     const jsonString = JSON.stringify(conversations);
 
     // Measure the on-disk size of the store before writing the update.
