@@ -6,6 +6,7 @@ const LIVE_REGION_TTL_MS = 1000;
 const DEFAULT_REQUEST_TIMEOUT_MS = 15000;
 const DEFAULT_RETRY_ATTEMPTS = 2;
 const RETRY_BASE_DELAY_MS = 250;
+const RETRY_MAX_DELAY_MS = 8000;
 const RETRYABLE_STATUS_CODES = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 const isNonEmptyString = (value) =>
@@ -113,12 +114,15 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Compute an exponential backoff delay with light jitter so concurrent
- * retries do not stampede the server in lockstep.
+ * retries do not stampede the server in lockstep. The result is capped
+ * at RETRY_MAX_DELAY_MS so high attempt counts do not produce absurd
+ * waits (e.g. attempt=20 would otherwise overflow into minutes).
  */
 const backoffDelay = (attempt) => {
-  const exponential = RETRY_BASE_DELAY_MS * Math.pow(2, attempt);
+  const safeAttempt = Math.min(attempt, 16);
+  const exponential = RETRY_BASE_DELAY_MS * Math.pow(2, safeAttempt);
   const jitter = Math.random() * RETRY_BASE_DELAY_MS;
-  return exponential + jitter;
+  return Math.min(exponential + jitter, RETRY_MAX_DELAY_MS);
 };
 
 const isRetryableError = (err) => {
@@ -126,6 +130,9 @@ const isRetryableError = (err) => {
   if (err.name === "AbortError") return true;
   return err instanceof TypeError;
 };
+
+const announceFailure = () =>
+  announceToScreenReader("Message failed to send.", "assertive");
 
 const sendMessage = async (convo, currentMessage, options = {}) => {
   assertValidConvo(convo);
@@ -137,6 +144,7 @@ const sendMessage = async (convo, currentMessage, options = {}) => {
 
   let lastError;
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const isFinalAttempt = attempt === maxAttempts - 1;
     let response;
     try {
       response = await withTimeout(
@@ -150,11 +158,11 @@ const sendMessage = async (convo, currentMessage, options = {}) => {
       );
     } catch (err) {
       lastError = err;
-      if (attempt < maxAttempts - 1 && isRetryableError(err)) {
+      if (!isFinalAttempt && isRetryableError(err)) {
         await delay(backoffDelay(attempt));
         continue;
       }
-      announceToScreenReader("Message failed to send.", "assertive");
+      announceFailure();
       throw err;
     }
 
@@ -163,10 +171,7 @@ const sendMessage = async (convo, currentMessage, options = {}) => {
       return response;
     }
 
-    if (
-      attempt < maxAttempts - 1 &&
-      RETRYABLE_STATUS_CODES.has(response.status)
-    ) {
+    if (!isFinalAttempt && RETRYABLE_STATUS_CODES.has(response.status)) {
       lastError = new Error(
         `Failed to send message (status ${response.status})`
       );
@@ -174,11 +179,11 @@ const sendMessage = async (convo, currentMessage, options = {}) => {
       continue;
     }
 
-    announceToScreenReader("Message failed to send.", "assertive");
+    announceFailure();
     throw new Error(`Failed to send message (status ${response.status})`);
   }
 
-  announceToScreenReader("Message failed to send.", "assertive");
+  announceFailure();
   throw lastError || new Error("sendMessage: exhausted retry attempts");
 };
 
