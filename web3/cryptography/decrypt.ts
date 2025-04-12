@@ -21,6 +21,9 @@ const HEX_CHARS_PER_BYTE = 2;
 /** Radix used when parsing hex character pairs into byte values. */
 const HEX_RADIX = 16;
 
+/** Maximum value representable in a single unsigned byte. */
+const MAX_BYTE_VALUE = 0xff;
+
 /**
  * Returns `true` when `value` is a well-formed hex string of even length.
  *
@@ -108,7 +111,7 @@ const parseHexByte = (source: string, offset: number): number => {
     source.slice(offset, offset + HEX_CHARS_PER_BYTE),
     HEX_RADIX,
   );
-  if (!Number.isInteger(byte) || byte < 0 || byte > 0xff) {
+  if (!Number.isInteger(byte) || byte < 0 || byte > MAX_BYTE_VALUE) {
     throw new Error(`decrypt: malformed hex byte at offset ${offset}`);
   }
   return byte;
