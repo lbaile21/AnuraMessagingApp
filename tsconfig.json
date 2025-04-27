@@ -30,9 +30,23 @@
       "@/public/*": ["./public/*"],
       "@/config/*": ["./config/*"],
       "@/context/*": ["./context/*"],
-      "@/tests/*": ["./tests/*"]
+      "@/tests/*": ["./tests/*"],
+      "@/services/*": ["./services/*"],
+      "@/store/*": ["./store/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", ".next", "out", "dist", "build", "coverage", "cypress", "**/*.spec.ts", "**/*.test.ts"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "out",
+    "dist",
+    "build",
+    "coverage",
+    "cypress",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.spec.tsx",
+    "**/*.test.tsx"
+  ]
 }
