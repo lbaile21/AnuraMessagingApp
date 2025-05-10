@@ -14,7 +14,8 @@ const cacheKey = (tokenID: Conversation["tokenID"]) => String(tokenID);
  * Looks up any locally cached messages for a given NFT token identifier.
  *
  * Returns an empty array when no cached thread exists, ensuring callers
- * always receive an iterable value safe for rendering.
+ * always receive an iterable value safe for rendering (and for assistive
+ * technologies that announce list contents).
  */
 const getCachedMessages = (tokenID: Conversation["tokenID"]): CachedMessages =>
   ((conversations as Record<string, CachedMessages>)[cacheKey(tokenID)] ??
@@ -40,7 +41,7 @@ const assertArgs = (contract: any, wallet: unknown) => {
     throw new Error("refreshConvo requires a contract instance");
   }
   if (typeof wallet !== "string" || wallet.trim() === "") {
-    throw new Error("refreshConvo requires a wallet address");
+    throw new Error("refreshConvo requires a non-empty wallet address");
   }
   if (!contract.methods?.getMyActiveConversations) {
     throw new Error(
