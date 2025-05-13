@@ -11,21 +11,19 @@
  *          Pair with `decrypt` using the same `secretHash` to recover the plaintext.
  */
 const encrypt = (secretHash: string, message: string): string => {
-  const cipher = (salt) => {
-    const textToChars = (text) => text.split("").map((c) => c.charCodeAt(0));
-    const byteHex = (n) => ("0" + Number(n).toString(16)).slice(-2);
-    const applySaltToChar = (code) =>
-      textToChars(salt).reduce((a, b) => a ^ b, code);
+  // Precompute the combined XOR value from the salt once, rather than
+  // reducing over the salt characters for every character of the message.
+  let saltXor = 0;
+  for (let i = 0; i < secretHash.length; i++) {
+    saltXor ^= secretHash.charCodeAt(i);
+  }
 
-    return (text) =>
-      text
-        .split("")
-        .map(textToChars)
-        .map(applySaltToChar)
-        .map(byteHex)
-        .join("");
-  };
-  const encryptMyMessage = cipher(secretHash);
-  return encryptMyMessage(message);
+  const byteHex = (n: number) => ("0" + n.toString(16)).slice(-2);
+
+  let out = "";
+  for (let i = 0; i < message.length; i++) {
+    out += byteHex(message.charCodeAt(i) ^ saltXor);
+  }
+  return out;
 };
 export default encrypt;
