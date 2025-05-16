@@ -18,9 +18,10 @@ import path from "path";
  *     "message": unknown   // payload to associate with the tokenID
  *   }
  *
- * Response: the current size of `conversations.json` in megabytes (measured
- * prior to the write), which callers can use as a lightweight signal for
- * storage growth over time.
+ * Response: an object describing the write outcome, including the current
+ * size of `conversations.json` in megabytes (measured prior to the write)
+ * and the total number of entries after the merge. Callers can use the
+ * size as a lightweight signal for storage growth over time.
  *
  * Errors:
  *   - 405 if the request method is not POST
@@ -30,6 +31,7 @@ import path from "path";
 const CONVERSATIONS_PATH = path.join(process.cwd(), "conversations.json");
 const BYTES_PER_MB = 1024 * 1024;
 const MAX_TOKEN_ID_LENGTH = 256;
+const MAX_MESSAGE_BYTES = 1 * BYTES_PER_MB; // 1 MB per single message
 
 const getFileSizeInMB = (filePath: string): number => {
   try {
@@ -57,6 +59,19 @@ const parseBody = (body: unknown): Record<string, any> => {
   return {};
 };
 
+/**
+ * Estimate the serialized byte size of an arbitrary message payload. Returns
+ * `Infinity` if the payload cannot be stringified (e.g. contains a circular
+ * reference) so that validation rejects it.
+ */
+const approximateMessageSize = (message: unknown): number => {
+  try {
+    return Buffer.byteLength(JSON.stringify(message) ?? "", "utf8");
+  } catch {
+    return Infinity;
+  }
+};
+
 const validatePayload = (
   tokenID: unknown,
   message: unknown
@@ -70,8 +85,26 @@ const validatePayload = (
   if (message === undefined || message === null) {
     return "Missing message payload";
   }
+  if (approximateMessageSize(message) > MAX_MESSAGE_BYTES) {
+    return "message payload is too large";
+  }
   return null;
 };
+
+/**
+ * Write the updated conversations map to disk, wrapped in a Promise so the
+ * handler can `await` completion and surface any I/O errors to the caller.
+ */
+const writeConversations = (
+  filePath: string,
+  payload: string
+): Promise<void> =>
+  new Promise((resolve, reject) => {
+    fs.writeFile(filePath, payload, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
 
 const postConversation = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -96,17 +129,17 @@ const postConversation = async (req: NextApiRequest, res: NextApiResponse) => {
     // Measure the on-disk size of the store before writing the update.
     const fileSizeInMegabytes = getFileSizeInMB(CONVERSATIONS_PATH);
 
-    // Persist the updated conversations map back to disk.
-    fs.writeFile(CONVERSATIONS_PATH, jsonString, (err) => {
-      if (err) {
-        console.log("Error writing file", err);
-      } else {
-        console.log("Successfully wrote file");
-      }
-    });
+    try {
+      await writeConversations(CONVERSATIONS_PATH, jsonString);
+    } catch (writeErr) {
+      console.log("Error writing file", writeErr);
+      return res.status(500).json({ err: "Failed to persist conversation" });
+    }
 
-    // Return the pre-write file size (in MB) to the caller.
-    res.json(fileSizeInMegabytes);
+    return res.json({
+      sizeMB: fileSizeInMegabytes,
+      entries: Object.keys(conversations).length,
+    });
   } catch (err) {
     res.status(err.status ?? 500).json({ err: err.message });
   }
